@@ -1,0 +1,67 @@
+{
+  "name": "nadace-frontend",
+  "version": "1.0.0",
+  "description": "Nadace Inge a Miloše Pavelcových - komunitní systém",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "electron:dev": "electron .",
+    "electron:build": "next build && electron-builder --win",
+    "electron:build:all": "next build && electron-builder --win --mac --linux"
+  },
+  "build": {
+    "appId": "cz.nadace-pavelcovych",
+    "productName": "Nadace Pavelcovych",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "asar": false,
+    "files": [
+      "electron/**/*",
+      "public/**/*",
+      "node_modules/**/*",
+      "package.json",
+      "next.config.js"
+    ],
+    "extraFiles": [
+      {
+        "from": ".next",
+        "to": "resources/app/.next",
+        "filter": ["**/*"]
+      }
+    ],
+    "extraResources": [
+      {
+        "from": "../nadace-backend",
+        "to": "nadace-backend",
+        "filter": [
+          "**/*",
+          "!node_modules/.cache/**"
+        ]
+      }
+    ],
+    "win": {
+      "target": "portable"
+    },
+    "portable": {
+      "artifactName": "Nadace-Pavelcovych.${ext}"
+    }
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "date-fns": "^4.1.0",
+    "lucide-react": "^0.577.0",
+    "next": "^14.2.35",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "electron": "^41.0.3",
+    "electron-builder": "^26.8.1",
+    "png-to-ico": "^3.0.1"
+  }
+}
