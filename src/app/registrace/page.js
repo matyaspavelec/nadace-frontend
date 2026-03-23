@@ -7,15 +7,20 @@ import { UserPlus } from 'lucide-react';
 export default function RegisterPage() {
   const [form, setForm] = useState({
     email: '', password: '', passwordConfirm: '',
-    firstName: '', lastName: '', dateOfBirth: '',
-    addressStreet: '', addressCity: 'Vyšší Brod', addressZip: '38273',
-    phone: '', isPermanentResident: false, gdprConsent: false, rulesConsent: false,
+    firstName: '', lastName: '', birthYear: '',
+    phone: '', gdprConsent: false, rulesConsent: false,
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const set = (k, v) => setForm(prev => ({ ...prev, [k]: v }));
+
+  const currentYear = new Date().getFullYear();
+  const years = [];
+  for (let y = currentYear - 18; y >= currentYear - 100; y--) {
+    years.push(y);
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,12 +32,23 @@ export default function RegisterPage() {
     if (form.password.length < 8) {
       return setError('Heslo musí mít alespoň 8 znaků.');
     }
+    if (!form.birthYear) {
+      return setError('Vyberte rok narození.');
+    }
 
     setLoading(true);
     try {
       await api.register({
-        ...form,
-        isPermanentResident: String(form.isPermanentResident),
+        email: form.email,
+        password: form.password,
+        firstName: form.firstName,
+        lastName: form.lastName,
+        dateOfBirth: `${form.birthYear}-01-01`,
+        phone: form.phone,
+        addressStreet: '-',
+        addressCity: 'Vyšší Brod',
+        addressZip: '38273',
+        isPermanentResident: 'false',
         gdprConsent: String(form.gdprConsent),
         rulesConsent: String(form.rulesConsent),
       });
@@ -48,9 +64,9 @@ export default function RegisterPage() {
       <div className="page-container" style={{ maxWidth: 500, margin: '0 auto' }}>
         <div className="card" style={{ marginTop: '3rem', textAlign: 'center' }}>
           <h2 style={{ color: 'var(--success)', marginBottom: '1rem' }}>Registrace úspěšná!</h2>
-          <p>Na váš e-mail jsme odeslali ověřovací odkaz. Klikněte na něj pro dokončení registrace.</p>
+          <p>Vaše registrace byla přijata.</p>
           <p style={{ marginTop: '1rem', color: 'var(--text-light)', fontSize: '0.9rem' }}>
-            Po ověření e-mailu bude vaše registrace předána ke schválení administrátorem.
+            Vaše registrace bude předána ke schválení administrátorem. O výsledku vás budeme informovat.
           </p>
           <Link href="/login" className="btn btn-primary" style={{ marginTop: '1.5rem' }}>
             Přejít na přihlášení
@@ -61,7 +77,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="page-container" style={{ maxWidth: 600, margin: '0 auto' }}>
+    <div className="page-container" style={{ maxWidth: 500, margin: '0 auto' }}>
       <div className="card" style={{ marginTop: '2rem' }}>
         <h1 className="page-title" style={{ textAlign: 'center' }}>
           <UserPlus size={28} style={{ verticalAlign: 'middle', marginRight: 8 }} />
@@ -102,36 +118,17 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Datum narození *</label>
-            <input type="date" className="form-input" value={form.dateOfBirth} onChange={e => set('dateOfBirth', e.target.value)} required />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Ulice a číslo *</label>
-            <input className="form-input" value={form.addressStreet} onChange={e => set('addressStreet', e.target.value)} required />
-          </div>
-
           <div className="form-row">
             <div className="form-group">
-              <label className="form-label">Město *</label>
-              <input className="form-input" value={form.addressCity} onChange={e => set('addressCity', e.target.value)} required />
+              <label className="form-label">Rok narození *</label>
+              <select className="form-input" value={form.birthYear} onChange={e => set('birthYear', e.target.value)} required>
+                <option value="">Vyberte...</option>
+                {years.map(y => <option key={y} value={y}>{y}</option>)}
+              </select>
             </div>
             <div className="form-group">
-              <label className="form-label">PSČ *</label>
-              <input className="form-input" value={form.addressZip} onChange={e => set('addressZip', e.target.value)} required />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Telefon *</label>
-            <input className="form-input" value={form.phone} onChange={e => set('phone', e.target.value)} placeholder="+420..." required />
-          </div>
-
-          <div className="form-group">
-            <div className="checkbox-group">
-              <input type="checkbox" id="resident" checked={form.isPermanentResident} onChange={e => set('isPermanentResident', e.target.checked)} />
-              <label htmlFor="resident">Potvrzuji, že mám trvalé bydliště ve Vyšším Brodě</label>
+              <label className="form-label">Telefon *</label>
+              <input className="form-input" value={form.phone} onChange={e => set('phone', e.target.value)} placeholder="+420..." required />
             </div>
           </div>
 
