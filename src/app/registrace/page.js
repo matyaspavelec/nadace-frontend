@@ -93,28 +93,28 @@ export default function RegisterPage() {
           <div className="form-row">
             <div className="form-group">
               <label className="form-label">Jméno *</label>
-              <input className="form-input" value={form.firstName} onChange={e => set('firstName', e.target.value)} required />
+              <input className="form-input" autoComplete="given-name" value={form.firstName} onChange={e => set('firstName', e.target.value)} required />
             </div>
             <div className="form-group">
               <label className="form-label">Příjmení *</label>
-              <input className="form-input" value={form.lastName} onChange={e => set('lastName', e.target.value)} required />
+              <input className="form-input" autoComplete="family-name" value={form.lastName} onChange={e => set('lastName', e.target.value)} required />
             </div>
           </div>
 
           <div className="form-group">
             <label className="form-label">E-mail *</label>
-            <input type="email" className="form-input" value={form.email} onChange={e => set('email', e.target.value)} required />
+            <input type="email" className="form-input" autoComplete="email" value={form.email} onChange={e => set('email', e.target.value)} required />
           </div>
 
           <div className="form-row">
             <div className="form-group">
               <label className="form-label">Heslo *</label>
-              <input type="password" className="form-input" value={form.password} onChange={e => set('password', e.target.value)} required />
+              <input type="password" className="form-input" autoComplete="new-password" value={form.password} onChange={e => set('password', e.target.value)} required />
               <span className="form-hint">Alespoň 8 znaků</span>
             </div>
             <div className="form-group">
               <label className="form-label">Heslo znovu *</label>
-              <input type="password" className="form-input" value={form.passwordConfirm} onChange={e => set('passwordConfirm', e.target.value)} required />
+              <input type="password" className="form-input" autoComplete="new-password" value={form.passwordConfirm} onChange={e => set('passwordConfirm', e.target.value)} required />
             </div>
           </div>
 

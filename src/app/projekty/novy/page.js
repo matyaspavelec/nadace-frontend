@@ -10,10 +10,9 @@ export default function NewProjectPage() {
   const router = useRouter();
   const [form, setForm] = useState({
     title: '', summary: '', description: '', benefitForCity: '',
-    targetGroup: '', location: '', estimatedBudget: '', requestedSupport: '',
-    realizationDate: '', implementedBy: '', isLongTerm: false,
-    operatingCosts: '', maintainedBy: '', mainRisks: '',
-    previouslyDiscussed: '', publicInterest: true, estimatedBeneficiaries: '',
+    requestedSupport: '',
+    realizationDate: '', isLongTerm: false,
+    publicInterest: true,
     category: 'OTHER', budgetSize: 'MEDIUM', declaration: false,
   });
   const [files, setFiles] = useState([]);
@@ -81,17 +80,6 @@ export default function NewProjectPage() {
 
           <div className="form-row">
             <div className="form-group">
-              <label className="form-label">Cílová skupina *</label>
-              <input className="form-input" value={form.targetGroup} onChange={e => set('targetGroup', e.target.value)} required />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Místo realizace *</label>
-              <input className="form-input" value={form.location} onChange={e => set('location', e.target.value)} required />
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
               <label className="form-label">Kategorie</label>
               <select className="form-select" value={form.category} onChange={e => set('category', e.target.value)}>
                 {Object.entries(PROJECT_CATEGORIES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
@@ -111,23 +99,12 @@ export default function NewProjectPage() {
 
           <div className="form-row">
             <div className="form-group">
-              <label className="form-label">Předpokládaný rozpočet (Kč) *</label>
-              <input type="number" className="form-input" value={form.estimatedBudget} onChange={e => set('estimatedBudget', e.target.value)} required min="0" />
-            </div>
-            <div className="form-group">
               <label className="form-label">Požadovaná podpora od nadace (Kč) *</label>
               <input type="number" className="form-input" value={form.requestedSupport} onChange={e => set('requestedSupport', e.target.value)} required min="0" />
             </div>
-          </div>
-
-          <div className="form-row">
             <div className="form-group">
               <label className="form-label">Termín realizace *</label>
               <input className="form-input" value={form.realizationDate} onChange={e => set('realizationDate', e.target.value)} required placeholder="např. jaro 2027" />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Kdo bude realizovat *</label>
-              <input className="form-input" value={form.implementedBy} onChange={e => set('implementedBy', e.target.value)} required />
             </div>
           </div>
 
@@ -136,35 +113,6 @@ export default function NewProjectPage() {
               <input type="checkbox" id="longterm" checked={form.isLongTerm} onChange={e => set('isLongTerm', e.target.checked)} />
               <label htmlFor="longterm">Projekt má dlouhodobý charakter</label>
             </div>
-          </div>
-        </div>
-
-        <div className="card" style={{ marginBottom: '1.5rem' }}>
-          <h3 style={{ marginBottom: '1rem' }}>Doplňující informace</h3>
-
-          <div className="form-group">
-            <label className="form-label">Odhad provozních nákladů po dokončení</label>
-            <input className="form-input" value={form.operatingCosts} onChange={e => set('operatingCosts', e.target.value)} />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Kdo bude projekt udržovat</label>
-            <input className="form-input" value={form.maintainedBy} onChange={e => set('maintainedBy', e.target.value)} />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Hlavní rizika projektu</label>
-            <textarea className="form-textarea" value={form.mainRisks} onChange={e => set('mainRisks', e.target.value)} style={{ minHeight: 60 }} />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Byl projekt někde projednáván?</label>
-            <input className="form-input" value={form.previouslyDiscussed} onChange={e => set('previouslyDiscussed', e.target.value)} />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Odhadovaný počet příjemců</label>
-            <input type="number" className="form-input" value={form.estimatedBeneficiaries} onChange={e => set('estimatedBeneficiaries', e.target.value)} min="0" />
           </div>
         </div>
 

@@ -19,6 +19,14 @@ export default function AdminProjectDetailPage() {
   const [votingStart, setVotingStart] = useState('');
   const [votingEnd, setVotingEnd] = useState('');
 
+  // Internal admin fields
+  const [internal, setInternal] = useState({
+    targetGroup: '', location: '', estimatedBudget: '', implementedBy: '',
+    operatingCosts: '', maintainedBy: '', mainRisks: '',
+    previouslyDiscussed: '', estimatedBeneficiaries: '',
+  });
+  const setInt = (k, v) => setInternal(prev => ({ ...prev, [k]: v }));
+
   // Review
   const [review, setReview] = useState({
     statuteCompliance: 3, publicBenefit: 3, feasibility: 3, budgetAdequacy: 3,
@@ -31,6 +39,17 @@ export default function AdminProjectDetailPage() {
       setProject(p);
       setNewStatus(p.status);
       setFoundationComment(p.foundationComment || '');
+      setInternal({
+        targetGroup: p.targetGroup || '',
+        location: p.location || '',
+        estimatedBudget: p.estimatedBudget || '',
+        implementedBy: p.implementedBy || '',
+        operatingCosts: p.operatingCosts || '',
+        maintainedBy: p.maintainedBy || '',
+        mainRisks: p.mainRisks || '',
+        previouslyDiscussed: p.previouslyDiscussed || '',
+        estimatedBeneficiaries: p.estimatedBeneficiaries || '',
+      });
       setLoading(false);
     }).catch(() => setLoading(false));
   };
@@ -56,6 +75,14 @@ export default function AdminProjectDetailPage() {
       setMsg('Recenze uložena.');
       load();
     } catch (err) { setMsg(err.error || 'Chyba.'); }
+  };
+
+  const saveInternal = async () => {
+    try {
+      await api.updateProjectInternal(id, internal);
+      setMsg('Interní údaje uloženy.');
+      load();
+    } catch (err) { setMsg(err.error || 'Chyba při ukládání.'); }
   };
 
   const requestCompletion = async () => {
@@ -86,6 +113,7 @@ export default function AdminProjectDetailPage() {
 
       <div className="tabs">
         <button className={`tab ${tab === 'detail' ? 'active' : ''}`} onClick={() => setTab('detail')}>Detail</button>
+        <button className={`tab ${tab === 'internal' ? 'active' : ''}`} onClick={() => setTab('internal')}>Interní</button>
         <button className={`tab ${tab === 'status' ? 'active' : ''}`} onClick={() => setTab('status')}>Stav</button>
         <button className={`tab ${tab === 'review' ? 'active' : ''}`} onClick={() => setTab('review')}>Recenze ({project.reviews?.length || 0})</button>
         <button className={`tab ${tab === 'history' ? 'active' : ''}`} onClick={() => setTab('history')}>Historie</button>
@@ -130,6 +158,67 @@ export default function AdminProjectDetailPage() {
               <div className="detail-value">Pro: {project.votesFor} | Proti: {project.votesAgainst}</div>
             </div>
           </div>
+        </div>
+      )}
+
+      {tab === 'internal' && (
+        <div className="card" style={{ maxWidth: 700 }}>
+          <h3 style={{ marginBottom: '1rem' }}>Interní údaje projektu</h3>
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-light)', marginBottom: '1.5rem' }}>
+            Tyto údaje vyplňuje administrátor. Nejsou součástí formuláře pro členy.
+          </p>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">Cílová skupina</label>
+              <input className="form-input" value={internal.targetGroup} onChange={e => setInt('targetGroup', e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Místo realizace</label>
+              <input className="form-input" value={internal.location} onChange={e => setInt('location', e.target.value)} />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">Předpokládaný rozpočet (Kč)</label>
+              <input type="number" className="form-input" value={internal.estimatedBudget} onChange={e => setInt('estimatedBudget', e.target.value)} min="0" />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Kdo bude realizovat</label>
+              <input className="form-input" value={internal.implementedBy} onChange={e => setInt('implementedBy', e.target.value)} />
+            </div>
+          </div>
+
+          <hr style={{ margin: '1.5rem 0', borderColor: 'var(--border)' }} />
+          <h4 style={{ marginBottom: '1rem' }}>Doplňující informace</h4>
+
+          <div className="form-group">
+            <label className="form-label">Odhad provozních nákladů po dokončení</label>
+            <input className="form-input" value={internal.operatingCosts} onChange={e => setInt('operatingCosts', e.target.value)} />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Kdo bude projekt udržovat</label>
+            <input className="form-input" value={internal.maintainedBy} onChange={e => setInt('maintainedBy', e.target.value)} />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Hlavní rizika projektu</label>
+            <textarea className="form-textarea" value={internal.mainRisks} onChange={e => setInt('mainRisks', e.target.value)} style={{ minHeight: 60 }} />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Byl projekt někde projednáván?</label>
+            <input className="form-input" value={internal.previouslyDiscussed} onChange={e => setInt('previouslyDiscussed', e.target.value)} />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Odhadovaný počet příjemců</label>
+            <input type="number" className="form-input" value={internal.estimatedBeneficiaries} onChange={e => setInt('estimatedBeneficiaries', e.target.value)} min="0" />
+          </div>
+
+          <button className="btn btn-primary" onClick={saveInternal} style={{ marginTop: '1rem' }}>Uložit interní údaje</button>
         </div>
       )}
 
