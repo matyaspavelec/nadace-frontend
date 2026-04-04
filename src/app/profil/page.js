@@ -123,7 +123,7 @@ export default function ProfilePage() {
 
       {tab === 'projects' && (
         <div>
-          {user.registrationStatus === 'APPROVED' && (
+          {(user.registrationStatus === 'APPROVED' || user.role === 'ADMIN') && (
             <Link href="/projekty/novy" className="btn btn-primary" style={{ marginBottom: '1.5rem' }}>
               + Podat nový projekt
             </Link>
