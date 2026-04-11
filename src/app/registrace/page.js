@@ -83,24 +83,8 @@ export default function RegisterPage() {
     );
   }
 
-  const sectionStyle = {
-    border: '1px solid var(--border)',
-    borderRadius: 'var(--radius)',
-    padding: '1.25rem',
-    marginBottom: '1.25rem',
-    background: '#fafafa',
-  };
-  const sectionTitle = {
-    fontSize: '0.8rem',
-    fontWeight: 700,
-    textTransform: 'uppercase',
-    letterSpacing: '0.05em',
-    color: 'var(--text-light)',
-    marginBottom: '1rem',
-  };
-
   return (
-    <div className="page-container" style={{ maxWidth: 560, margin: '0 auto' }}>
+    <div className="page-container" style={{ maxWidth: 500, margin: '0 auto' }}>
       <div className="card" style={{ marginTop: '2rem' }}>
         <h1 className="page-title" style={{ textAlign: 'center' }}>
           <UserPlus size={28} style={{ verticalAlign: 'middle', marginRight: 8 }} />
@@ -113,67 +97,66 @@ export default function RegisterPage() {
         {error && <div className="alert alert-error">{error}</div>}
 
         <form onSubmit={handleSubmit} autoComplete="on">
-
-          {/* ===== SEKCE: ZÁKLADNÍ ÚDAJE ===== */}
-          <div style={sectionStyle}>
-            <div style={sectionTitle}>Základní údaje</div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label" htmlFor="firstName">Jméno *</label>
-                <input id="firstName" name="firstName" className="form-input" autoComplete="given-name" value={form.firstName} onChange={e => set('firstName', e.target.value)} required />
-              </div>
-              <div className="form-group">
-                <label className="form-label" htmlFor="lastName">Příjmení *</label>
-                <input id="lastName" name="lastName" className="form-input" autoComplete="family-name" value={form.lastName} onChange={e => set('lastName', e.target.value)} required />
-              </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label" htmlFor="firstName">Jméno *</label>
+              <input id="firstName" name="firstName" className="form-input" autoComplete="given-name" value={form.firstName} onChange={e => set('firstName', e.target.value)} required />
             </div>
-
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label" htmlFor="email">E-mail *</label>
-              <input id="email" name="email" type="email" className="form-input" autoComplete="email" value={form.email} onChange={e => set('email', e.target.value)} required />
+            <div className="form-group">
+              <label className="form-label" htmlFor="lastName">Příjmení *</label>
+              <input id="lastName" name="lastName" className="form-input" autoComplete="family-name" value={form.lastName} onChange={e => set('lastName', e.target.value)} required />
             </div>
           </div>
 
-          {/* ===== SEKCE: HESLO ===== */}
-          <div style={sectionStyle}>
-            <div style={sectionTitle}>Přihlašovací heslo</div>
+          <div className="form-group">
+            <label className="form-label" htmlFor="email">E-mail *</label>
+            <input id="email" name="email" type="email" className="form-input" autoComplete="email" value={form.email} onChange={e => set('email', e.target.value)} required />
+          </div>
 
-            <div className="form-row" style={{ marginBottom: 0 }}>
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label" htmlFor="password">Heslo *</label>
-                <input id="password" name="password" type="password" className="form-input" autoComplete="new-password" value={form.password} onChange={e => set('password', e.target.value)} required />
-                <span className="form-hint">Alespoň 8 znaků</span>
-              </div>
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label" htmlFor="passwordConfirm">Heslo znovu *</label>
-                <input id="passwordConfirm" name="passwordConfirm" type="password" className="form-input" autoComplete="new-password" value={form.passwordConfirm} onChange={e => set('passwordConfirm', e.target.value)} required />
-              </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label" htmlFor="password">Heslo *</label>
+              <input id="password" name="password" type="password" className="form-input" autoComplete="new-password" value={form.password} onChange={e => set('password', e.target.value)} required />
+              <span className="form-hint">Alespoň 8 znaků</span>
+            </div>
+            <div className="form-group">
+              <label className="form-label" htmlFor="passwordConfirm">Heslo znovu *</label>
+              <input id="passwordConfirm" name="passwordConfirm" type="password" className="form-input" autoComplete="new-password" value={form.passwordConfirm} onChange={e => set('passwordConfirm', e.target.value)} required />
             </div>
           </div>
 
-          {/* ===== SEKCE: KONTAKTNÍ ÚDAJE ===== */}
-          <div style={sectionStyle}>
-            <div style={sectionTitle}>Kontaktní údaje</div>
-
-            <div className="form-row" style={{ marginBottom: 0 }}>
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label" htmlFor="phone">Telefon *</label>
-                <input id="phone" name="phone" type="tel" autoComplete="tel" className="form-input" value={form.phone} onChange={e => set('phone', e.target.value)} placeholder="+420..." required />
-              </div>
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label" htmlFor="birthYear">Rok narození *</label>
-                <select id="birthYear" className="form-input" value={form.birthYear} onChange={e => set('birthYear', e.target.value)} required>
-                  <option value="">Vyberte...</option>
-                  {years.map(y => <option key={y} value={y}>{y}</option>)}
-                </select>
-              </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label" htmlFor="birthYear">Rok narození *</label>
+              <select id="birthYear" className="form-input" value={form.birthYear} onChange={e => set('birthYear', e.target.value)} required>
+                <option value="">Vyberte...</option>
+                {years.map(y => <option key={y} value={y}>{y}</option>)}
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label" htmlFor="phone">Telefon *</label>
+              <input id="phone" name="phone" type="tel" autoComplete="tel" className="form-input" value={form.phone} onChange={e => set('phone', e.target.value)} placeholder="+420..." required />
             </div>
           </div>
 
-          {/* ===== SEKCE: BYDLIŠTĚ ===== */}
-          <div style={sectionStyle}>
-            <div style={sectionTitle}>Bydliště</div>
+          {/* ===== BYDLIŠTĚ – jediná vizuálně oddělená sekce ===== */}
+          <div style={{
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--radius)',
+            padding: '1rem 1.25rem',
+            marginBottom: '1rem',
+            background: '#fafafa',
+          }}>
+            <div style={{
+              fontSize: '0.8rem',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              color: 'var(--text-light)',
+              marginBottom: '0.75rem',
+            }}>
+              Bydliště
+            </div>
 
             <div className="form-group" style={{ marginBottom: form.isPermanentResident ? 0 : '0.75rem' }}>
               <div className="checkbox-group">
@@ -207,22 +190,17 @@ export default function RegisterPage() {
             )}
           </div>
 
-          {/* ===== SEKCE: SOUHLASY ===== */}
-          <div style={sectionStyle}>
-            <div style={sectionTitle}>Souhlasy</div>
-
-            <div className="form-group">
-              <div className="checkbox-group">
-                <input type="checkbox" id="gdpr" checked={form.gdprConsent} onChange={e => set('gdprConsent', e.target.checked)} required />
-                <label htmlFor="gdpr">Souhlasím se zpracováním osobních údajů *</label>
-              </div>
+          <div className="form-group">
+            <div className="checkbox-group">
+              <input type="checkbox" id="gdpr" checked={form.gdprConsent} onChange={e => set('gdprConsent', e.target.checked)} required />
+              <label htmlFor="gdpr">Souhlasím se zpracováním osobních údajů *</label>
             </div>
+          </div>
 
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <div className="checkbox-group">
-                <input type="checkbox" id="rules" checked={form.rulesConsent} onChange={e => set('rulesConsent', e.target.checked)} required />
-                <label htmlFor="rules">Souhlasím s pravidly systému *</label>
-              </div>
+          <div className="form-group">
+            <div className="checkbox-group">
+              <input type="checkbox" id="rules" checked={form.rulesConsent} onChange={e => set('rulesConsent', e.target.checked)} required />
+              <label htmlFor="rules">Souhlasím s pravidly systému *</label>
             </div>
           </div>
 
