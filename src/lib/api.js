@@ -27,6 +27,7 @@ export const api = {
   login: (data) => request('/auth/login', { method: 'POST', body: JSON.stringify(data) }),
   register: (data) => request('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
   verifyEmail: (token) => request(`/auth/verify-email?token=${token}`),
+  resendVerification: (email) => request('/auth/resend-verification', { method: 'POST', body: JSON.stringify({ email }) }),
   getProfile: () => request('/auth/me'),
   updateMyProfile: (data) => request('/auth/me', { method: 'PATCH', body: JSON.stringify(data) }),
   deleteMyAccount: (data) => request('/auth/me', { method: 'DELETE', body: JSON.stringify(data) }),

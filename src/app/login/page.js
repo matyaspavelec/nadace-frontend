@@ -39,11 +39,11 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label className="form-label">E-mail</label>
-            <input type="email" className="form-input" value={email} onChange={e => setEmail(e.target.value)} required />
+            <input type="email" className="form-input" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" />
           </div>
           <div className="form-group">
             <label className="form-label">Heslo</label>
-            <input type="password" className="form-input" value={password} onChange={e => setPassword(e.target.value)} required />
+            <input type="password" className="form-input" value={password} onChange={e => setPassword(e.target.value)} required autoComplete="current-password" />
           </div>
           <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
             {loading ? 'Přihlašování...' : 'Přihlásit se'}

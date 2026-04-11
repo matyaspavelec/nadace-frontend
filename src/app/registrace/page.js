@@ -215,7 +215,7 @@ export default function RegisterPage() {
             <div className="checkbox-group">
               <input type="checkbox" id="gdpr" checked={form.gdprConsent} onChange={e => set('gdprConsent', e.target.checked)} required />
               <label htmlFor="gdpr">
-                Souhlasím se <Link href="/gdpr" target="_blank" style={{ textDecoration: 'underline' }}>zpracováním osobních údajů</Link> *
+                Souhlasím se <Link href="/gdpr" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline' }}>zpracováním osobních údajů</Link> *
               </label>
             </div>
           </div>

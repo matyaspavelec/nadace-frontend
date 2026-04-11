@@ -114,7 +114,10 @@ export default function ProjectDetailPage() {
             {isApproved && (
               <form onSubmit={handleComment} style={{ marginBottom: '1rem' }}>
                 <textarea className="form-textarea" value={comment} onChange={e => setComment(e.target.value)}
-                  placeholder="Napište komentář..." style={{ minHeight: 60 }} />
+                  placeholder="Napište komentář..." maxLength={2000} style={{ minHeight: 60 }} />
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-light)', textAlign: 'right' }}>
+                  {comment.length} / 2000
+                </div>
                 {commentMsg && <div className="alert alert-info" style={{ marginTop: 8 }}>{commentMsg}</div>}
                 <button type="submit" className="btn btn-primary btn-sm" style={{ marginTop: 8 }}>Odeslat komentář</button>
               </form>

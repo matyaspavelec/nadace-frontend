@@ -17,6 +17,18 @@ export default function ProfilePage() {
   const [deleteForm, setDeleteForm] = useState({ password: '', confirm: '' });
   const [deleteMsg, setDeleteMsg] = useState({ error: '', loading: false });
 
+  // Resend e-mail verifikace
+  const [resendMsg, setResendMsg] = useState('');
+  const handleResendVerification = async () => {
+    setResendMsg('');
+    try {
+      await api.resendVerification(profile.email);
+      setResendMsg('Pokud váš e-mail nebyl ověřený, odeslali jsme nový ověřovací odkaz.');
+    } catch {
+      setResendMsg('Pokud váš e-mail nebyl ověřený, odeslali jsme nový ověřovací odkaz.');
+    }
+  };
+
   const handleDeleteAccount = async (e) => {
     e.preventDefault();
     setDeleteMsg({ error: '', loading: true });
@@ -334,7 +346,20 @@ export default function ProfilePage() {
 
           {profile.registrationStatus !== 'APPROVED' && (
             <div className="alert alert-warning" style={{ marginTop: '1rem' }}>
-              {profile.registrationStatus === 'NEW' && 'Ověřte prosím svůj e-mail.'}
+              {profile.registrationStatus === 'NEW' && (
+                <div>
+                  <div>Ověřte prosím svůj e-mail. Bez ověření vás administrátor nemůže schválit.</div>
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-secondary"
+                    style={{ marginTop: 8 }}
+                    onClick={handleResendVerification}
+                  >
+                    Znovu odeslat ověřovací e-mail
+                  </button>
+                  {resendMsg && <div style={{ marginTop: 6, fontSize: '0.85rem' }}>{resendMsg}</div>}
+                </div>
+              )}
               {profile.registrationStatus === 'PENDING_REVIEW' && 'Vaše registrace čeká na kontrolu administrátorem.'}
               {profile.registrationStatus === 'INVITED_FOR_INTERVIEW' && 'Byli jste pozváni k osobnímu pohovoru. Budeme vás kontaktovat.'}
               {profile.registrationStatus === 'REJECTED' && 'Vaše registrace byla zamítnuta.'}
@@ -415,15 +440,15 @@ export default function ProfilePage() {
           <form onSubmit={handlePasswordChange}>
             <div className="form-group">
               <label className="form-label">Současné heslo</label>
-              <input type="password" className="form-input" value={pwForm.currentPassword} onChange={e => setPwForm(p => ({ ...p, currentPassword: e.target.value }))} required />
+              <input type="password" className="form-input" value={pwForm.currentPassword} onChange={e => setPwForm(p => ({ ...p, currentPassword: e.target.value }))} required autoComplete="current-password" />
             </div>
             <div className="form-group">
               <label className="form-label">Nové heslo</label>
-              <input type="password" className="form-input" value={pwForm.newPassword} onChange={e => setPwForm(p => ({ ...p, newPassword: e.target.value }))} required />
+              <input type="password" className="form-input" value={pwForm.newPassword} onChange={e => setPwForm(p => ({ ...p, newPassword: e.target.value }))} required minLength={8} autoComplete="new-password" />
             </div>
             <div className="form-group">
               <label className="form-label">Nové heslo znovu</label>
-              <input type="password" className="form-input" value={pwForm.confirm} onChange={e => setPwForm(p => ({ ...p, confirm: e.target.value }))} required />
+              <input type="password" className="form-input" value={pwForm.confirm} onChange={e => setPwForm(p => ({ ...p, confirm: e.target.value }))} required minLength={8} autoComplete="new-password" />
             </div>
             <button type="submit" className="btn btn-primary">Změnit heslo</button>
           </form>
