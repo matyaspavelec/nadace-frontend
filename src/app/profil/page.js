@@ -6,11 +6,28 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import StatusBadge from '@/components/StatusBadge';
 import { REGISTRATION_STATUSES, TRUST_LEVELS, ROLES } from '@/lib/constants';
-import { User, FolderOpen, Bell, Key, CheckCircle } from 'lucide-react';
+import { User, FolderOpen, Bell, Key, CheckCircle, AlertTriangle } from 'lucide-react';
 
 export default function ProfilePage() {
-  const { user, loading, loadUser } = useAuth();
+  const { user, loading, loadUser, logout } = useAuth();
   const router = useRouter();
+
+  // Smazání účtu
+  const [showDelete, setShowDelete] = useState(false);
+  const [deleteForm, setDeleteForm] = useState({ password: '', confirm: '' });
+  const [deleteMsg, setDeleteMsg] = useState({ error: '', loading: false });
+
+  const handleDeleteAccount = async (e) => {
+    e.preventDefault();
+    setDeleteMsg({ error: '', loading: true });
+    try {
+      await api.deleteMyAccount({ password: deleteForm.password, confirm: deleteForm.confirm });
+      logout();
+      router.push('/?deleted=1');
+    } catch (err) {
+      setDeleteMsg({ error: err.error || err.errors?.map(x => x.msg).join(', ') || 'Chyba při mazání účtu.', loading: false });
+    }
+  };
   const [profile, setProfile] = useState(null);
   const [myProjects, setMyProjects] = useState([]);
   const [notifications, setNotifications] = useState([]);
@@ -239,6 +256,80 @@ export default function ProfilePage() {
                 <button type="button" className="btn btn-secondary" onClick={() => setEditProfile(false)}>Zrušit</button>
               </div>
             </form>
+          )}
+
+          {/* ===== DANGER ZONE – GDPR právo na výmaz ===== */}
+          {!editProfile && (
+            <div style={{
+              marginTop: '2rem',
+              padding: '1rem 1.25rem',
+              border: '1px solid var(--danger, #dc2626)',
+              borderRadius: 'var(--radius)',
+              background: '#fef2f2',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                <AlertTriangle size={18} color="#dc2626" />
+                <strong style={{ color: '#dc2626' }}>Smazání účtu</strong>
+              </div>
+              <p style={{ fontSize: '0.88rem', color: 'var(--text-light)', marginBottom: '0.75rem' }}>
+                Máte právo kdykoliv požádat o smazání svého účtu (čl. 17 GDPR).
+                Vaše osobní údaje (jméno, e-mail, telefon, adresa, rok narození) budou nevratně
+                anonymizovány. Pokud jste podali projekty, hlasovali nebo komentovali, tyto záznamy
+                zůstanou v systému bez vazby na vaši identitu.
+              </p>
+
+              {!showDelete ? (
+                <button
+                  className="btn btn-sm"
+                  style={{ background: '#dc2626', color: '#fff' }}
+                  onClick={() => { setShowDelete(true); setDeleteMsg({ error: '', loading: false }); }}
+                >
+                  Smazat můj účet
+                </button>
+              ) : (
+                <form onSubmit={handleDeleteAccount} style={{ marginTop: '0.5rem' }}>
+                  {deleteMsg.error && <div className="alert alert-error">{deleteMsg.error}</div>}
+                  <div className="form-group">
+                    <label className="form-label">Vaše současné heslo</label>
+                    <input
+                      type="password"
+                      className="form-input"
+                      value={deleteForm.password}
+                      onChange={e => setDeleteForm(p => ({ ...p, password: e.target.value }))}
+                      required
+                      autoComplete="current-password"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Pro potvrzení napište <code>SMAZAT</code></label>
+                    <input
+                      className="form-input"
+                      value={deleteForm.confirm}
+                      onChange={e => setDeleteForm(p => ({ ...p, confirm: e.target.value }))}
+                      required
+                      placeholder="SMAZAT"
+                    />
+                  </div>
+                  <div className="btn-group">
+                    <button
+                      type="submit"
+                      className="btn"
+                      style={{ background: '#dc2626', color: '#fff' }}
+                      disabled={deleteMsg.loading}
+                    >
+                      {deleteMsg.loading ? 'Mažu…' : 'Definitivně smazat účet'}
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => { setShowDelete(false); setDeleteForm({ password: '', confirm: '' }); }}
+                    >
+                      Zrušit
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
           )}
 
           {profile.registrationStatus !== 'APPROVED' && (
