@@ -9,10 +9,22 @@ export default function RegisterPage() {
     email: '', password: '', passwordConfirm: '',
     firstName: '', lastName: '', birthYear: '',
     phone: '',
-    isPermanentResident: true,
+    residence: 'Vyšší Brod',
     otherCity: '',
     gdprConsent: false, rulesConsent: false,
   });
+
+  // Místní části města Vyšší Brod (oficiální, zdroj: mestovyssibrod.cz)
+  const VYSSI_BROD_PARTS = [
+    'Vyšší Brod',
+    'Dolní Drkolná',
+    'Dolní Jílovice',
+    'Herbertov',
+    'Hrudkov',
+    'Lachovice',
+    'Studánky',
+    'Těchoraz',
+  ];
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -38,13 +50,15 @@ export default function RegisterPage() {
     if (!form.birthYear) {
       return setError('Vyberte rok narození.');
     }
-    if (!form.isPermanentResident && !form.otherCity.trim()) {
+    const isOther = form.residence === 'OTHER';
+    if (isOther && !form.otherCity.trim()) {
       return setError('Uveďte obec trvalého pobytu.');
     }
 
     setLoading(true);
     try {
-      const city = form.isPermanentResident ? 'Vyšší Brod' : form.otherCity.trim();
+      const city = isOther ? form.otherCity.trim() : form.residence;
+      const isResident = !isOther;
       await api.register({
         email: form.email,
         password: form.password,
@@ -55,7 +69,7 @@ export default function RegisterPage() {
         addressStreet: '-',
         addressCity: city,
         addressZip: '-',
-        isPermanentResident: String(form.isPermanentResident),
+        isPermanentResident: String(isResident),
         gdprConsent: String(form.gdprConsent),
         rulesConsent: String(form.rulesConsent),
       });
@@ -158,21 +172,30 @@ export default function RegisterPage() {
               Bydliště
             </div>
 
-            <div className="form-group" style={{ marginBottom: form.isPermanentResident ? 0 : '0.75rem' }}>
-              <div className="checkbox-group">
-                <input
-                  type="checkbox"
-                  id="permanent"
-                  checked={form.isPermanentResident}
-                  onChange={e => set('isPermanentResident', e.target.checked)}
-                />
-                <label htmlFor="permanent">Mám trvalé bydliště ve Vyšším Brodě</label>
-              </div>
+            <div className="form-group" style={{ marginBottom: form.residence === 'OTHER' ? '0.75rem' : 0 }}>
+              <label className="form-label" htmlFor="residence">Kde bydlíte? *</label>
+              <select
+                id="residence"
+                className="form-input"
+                value={form.residence}
+                onChange={e => set('residence', e.target.value)}
+                required
+              >
+                {VYSSI_BROD_PARTS.map(p => (
+                  <option key={p} value={p}>{p}</option>
+                ))}
+                <option value="OTHER">Jiná obec (mimo Vyšší Brod)</option>
+              </select>
+              {form.residence !== 'OTHER' && (
+                <span className="form-hint">
+                  Vyšší Brod a jeho místní části – vaše trvalé bydliště je administrativně pod městem Vyšší Brod.
+                </span>
+              )}
             </div>
 
-            {!form.isPermanentResident && (
+            {form.residence === 'OTHER' && (
               <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label" htmlFor="otherCity">Obec trvalého pobytu *</label>
+                <label className="form-label" htmlFor="otherCity">Název obce *</label>
                 <input
                   id="otherCity"
                   name="otherCity"
