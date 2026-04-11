@@ -7,10 +7,8 @@ import { UserPlus } from 'lucide-react';
 export default function RegisterPage() {
   const [form, setForm] = useState({
     email: '', password: '', passwordConfirm: '',
-    firstName: '', lastName: '', dateOfBirth: '',
+    firstName: '', lastName: '', birthYear: '',
     phone: '',
-    addressStreet: '', addressCity: 'Vyšší Brod', addressZip: '38273',
-    isPermanentResident: true,
     gdprConsent: false, rulesConsent: false,
   });
   const [error, setError] = useState('');
@@ -19,11 +17,11 @@ export default function RegisterPage() {
 
   const set = (k, v) => setForm(prev => ({ ...prev, [k]: v }));
 
-  const maxDob = (() => {
-    const d = new Date();
-    d.setFullYear(d.getFullYear() - 18);
-    return d.toISOString().split('T')[0];
-  })();
+  const currentYear = new Date().getFullYear();
+  const years = [];
+  for (let y = currentYear - 18; y >= currentYear - 100; y--) {
+    years.push(y);
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,8 +33,8 @@ export default function RegisterPage() {
     if (form.password.length < 8) {
       return setError('Heslo musí mít alespoň 8 znaků.');
     }
-    if (!form.dateOfBirth) {
-      return setError('Vyplňte datum narození.');
+    if (!form.birthYear) {
+      return setError('Vyberte rok narození.');
     }
 
     setLoading(true);
@@ -46,12 +44,12 @@ export default function RegisterPage() {
         password: form.password,
         firstName: form.firstName,
         lastName: form.lastName,
-        dateOfBirth: form.dateOfBirth,
+        dateOfBirth: `${form.birthYear}-01-01`,
         phone: form.phone,
-        addressStreet: form.addressStreet,
-        addressCity: form.addressCity,
-        addressZip: form.addressZip,
-        isPermanentResident: String(form.isPermanentResident),
+        addressStreet: '-',
+        addressCity: '-',
+        addressZip: '-',
+        isPermanentResident: 'false',
         gdprConsent: String(form.gdprConsent),
         rulesConsent: String(form.rulesConsent),
       });
@@ -123,46 +121,15 @@ export default function RegisterPage() {
 
           <div className="form-row">
             <div className="form-group">
-              <label className="form-label" htmlFor="dateOfBirth">Datum narození *</label>
-              <input
-                id="dateOfBirth"
-                name="dateOfBirth"
-                type="date"
-                className="form-input"
-                autoComplete="bday"
-                value={form.dateOfBirth}
-                max={maxDob}
-                onChange={e => set('dateOfBirth', e.target.value)}
-                required
-              />
-              <span className="form-hint">Musíte být starší 18 let.</span>
+              <label className="form-label">Rok narození *</label>
+              <select className="form-input" value={form.birthYear} onChange={e => set('birthYear', e.target.value)} required>
+                <option value="">Vyberte...</option>
+                {years.map(y => <option key={y} value={y}>{y}</option>)}
+              </select>
             </div>
             <div className="form-group">
               <label className="form-label" htmlFor="phone">Telefon *</label>
               <input id="phone" name="phone" type="tel" autoComplete="tel" className="form-input" value={form.phone} onChange={e => set('phone', e.target.value)} placeholder="+420..." required />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label className="form-label" htmlFor="addressStreet">Ulice a č.p. *</label>
-            <input id="addressStreet" name="addressStreet" autoComplete="street-address" className="form-input" value={form.addressStreet} onChange={e => set('addressStreet', e.target.value)} required />
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label" htmlFor="addressCity">Město *</label>
-              <input id="addressCity" name="addressCity" autoComplete="address-level2" className="form-input" value={form.addressCity} onChange={e => set('addressCity', e.target.value)} required />
-            </div>
-            <div className="form-group">
-              <label className="form-label" htmlFor="addressZip">PSČ *</label>
-              <input id="addressZip" name="addressZip" autoComplete="postal-code" className="form-input" value={form.addressZip} onChange={e => set('addressZip', e.target.value)} required />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <div className="checkbox-group">
-              <input type="checkbox" id="permanent" checked={form.isPermanentResident} onChange={e => set('isPermanentResident', e.target.checked)} />
-              <label htmlFor="permanent">Mám trvalé bydliště ve Vyšším Brodě</label>
             </div>
           </div>
 
