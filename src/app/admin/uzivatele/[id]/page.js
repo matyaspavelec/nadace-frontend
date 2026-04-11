@@ -19,14 +19,42 @@ export default function AdminUserDetailPage() {
   const [interviewTime, setInterviewTime] = useState('10:00');
   const [interviewerName, setInterviewerName] = useState('');
 
+  // Editace osobních údajů
+  const [editProfile, setEditProfile] = useState(false);
+  const [profile, setProfile] = useState({
+    firstName: '', lastName: '', email: '', phone: '', dateOfBirth: '',
+    addressStreet: '', addressCity: '', addressZip: '', isPermanentResident: false,
+  });
+  const setProf = (k, v) => setProfile(prev => ({ ...prev, [k]: v }));
+
   const load = () => {
     api.getUser(id).then(u => {
       setUser(u);
       setNewRole(u.role);
       setNewTrust(u.trustLevel);
       setInternalNote(u.internalNote || '');
+      setProfile({
+        firstName: u.firstName || '',
+        lastName: u.lastName || '',
+        email: u.email || '',
+        phone: u.phone || '',
+        dateOfBirth: u.dateOfBirth ? new Date(u.dateOfBirth).toISOString().split('T')[0] : '',
+        addressStreet: u.addressStreet || '',
+        addressCity: u.addressCity || '',
+        addressZip: u.addressZip || '',
+        isPermanentResident: !!u.isPermanentResident,
+      });
       setLoading(false);
     }).catch(() => setLoading(false));
+  };
+
+  const saveProfile = async () => {
+    try {
+      await api.updateUserProfile(id, profile);
+      setMsg('Osobní údaje uloženy.');
+      setEditProfile(false);
+      load();
+    } catch (err) { setMsg(err.error || 'Chyba při ukládání.'); }
   };
 
   useEffect(() => { load(); }, [id]);
@@ -82,19 +110,82 @@ export default function AdminUserDetailPage() {
       <div className="detail-grid">
         <div>
           <div className="card" style={{ marginBottom: '1.5rem' }}>
-            <h3 style={{ marginBottom: '1rem' }}>Osobní údaje</h3>
-            <div className="detail-label">E-mail</div>
-            <div className="detail-value">{user.email} {user.emailVerified ? '(ověřen)' : '(neověřen)'}</div>
-            <div className="detail-label">Telefon</div>
-            <div className="detail-value">{user.phone}</div>
-            <div className="detail-label">Datum narození</div>
-            <div className="detail-value">{new Date(user.dateOfBirth).toLocaleDateString('cs-CZ')}</div>
-            <div className="detail-label">Adresa</div>
-            <div className="detail-value">{user.addressStreet}, {user.addressCity} {user.addressZip}</div>
-            <div className="detail-label">Trvalé bydliště ve V. Brodě</div>
-            <div className="detail-value">{user.isPermanentResident ? 'Ano' : 'Ne'}</div>
-            <div className="detail-label">Registrace</div>
-            <div className="detail-value">{new Date(user.createdAt).toLocaleDateString('cs-CZ')}</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <h3 style={{ margin: 0 }}>Osobní údaje</h3>
+              {!editProfile && (
+                <button className="btn btn-sm btn-secondary" onClick={() => setEditProfile(true)}>Upravit</button>
+              )}
+            </div>
+
+            {!editProfile ? (
+              <>
+                <div className="detail-label">Jméno</div>
+                <div className="detail-value">{user.firstName} {user.lastName}</div>
+                <div className="detail-label">E-mail</div>
+                <div className="detail-value">{user.email} {user.emailVerified ? '(ověřen)' : '(neověřen)'}</div>
+                <div className="detail-label">Telefon</div>
+                <div className="detail-value">{user.phone}</div>
+                <div className="detail-label">Datum narození</div>
+                <div className="detail-value">{user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString('cs-CZ') : '-'}</div>
+                <div className="detail-label">Adresa</div>
+                <div className="detail-value">{user.addressStreet}, {user.addressCity} {user.addressZip}</div>
+                <div className="detail-label">Trvalé bydliště ve V. Brodě</div>
+                <div className="detail-value">{user.isPermanentResident ? 'Ano' : 'Ne'}</div>
+                <div className="detail-label">Registrace</div>
+                <div className="detail-value">{new Date(user.createdAt).toLocaleDateString('cs-CZ')}</div>
+              </>
+            ) : (
+              <>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">Jméno</label>
+                    <input className="form-input" value={profile.firstName} onChange={e => setProf('firstName', e.target.value)} />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Příjmení</label>
+                    <input className="form-input" value={profile.lastName} onChange={e => setProf('lastName', e.target.value)} />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">E-mail</label>
+                  <input type="email" className="form-input" value={profile.email} onChange={e => setProf('email', e.target.value)} />
+                </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">Telefon</label>
+                    <input className="form-input" value={profile.phone} onChange={e => setProf('phone', e.target.value)} />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Datum narození</label>
+                    <input type="date" className="form-input" value={profile.dateOfBirth} onChange={e => setProf('dateOfBirth', e.target.value)} />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Ulice a č.p.</label>
+                  <input className="form-input" value={profile.addressStreet} onChange={e => setProf('addressStreet', e.target.value)} />
+                </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">Město</label>
+                    <input className="form-input" value={profile.addressCity} onChange={e => setProf('addressCity', e.target.value)} />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">PSČ</label>
+                    <input className="form-input" value={profile.addressZip} onChange={e => setProf('addressZip', e.target.value)} />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <input type="checkbox" checked={profile.isPermanentResident} onChange={e => setProf('isPermanentResident', e.target.checked)} />
+                    Trvalé bydliště ve Vyšším Brodě
+                  </label>
+                </div>
+                <div className="btn-group">
+                  <button className="btn btn-primary btn-sm" onClick={saveProfile}>Uložit</button>
+                  <button className="btn btn-secondary btn-sm" onClick={() => { setEditProfile(false); load(); }}>Zrušit</button>
+                </div>
+              </>
+            )}
             {user.approvedBy && (
               <>
                 <div className="detail-label">Schválil</div>
