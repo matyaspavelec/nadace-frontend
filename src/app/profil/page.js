@@ -19,6 +19,61 @@ export default function ProfilePage() {
   const [pwMsg, setPwMsg] = useState({ error: '', success: '' });
   const [showWelcome, setShowWelcome] = useState(false);
 
+  // Editace profilu
+  const [editProfile, setEditProfile] = useState(false);
+  const [profileForm, setProfileForm] = useState({
+    phone: '', addressStreet: '', addressCity: '', addressZip: '',
+    isPermanentResident: false, dateOfBirth: '',
+  });
+  const [profileMsg, setProfileMsg] = useState({ error: '', success: '' });
+  const setPf = (k, v) => setProfileForm(prev => ({ ...prev, [k]: v }));
+
+  const openProfileEdit = () => {
+    if (!profile) return;
+    setProfileForm({
+      phone: profile.phone || '',
+      addressStreet: profile.addressStreet || '',
+      addressCity: profile.addressCity || '',
+      addressZip: profile.addressZip || '',
+      isPermanentResident: !!profile.isPermanentResident,
+      dateOfBirth: profile.dateOfBirth ? new Date(profile.dateOfBirth).toISOString().split('T')[0] : '',
+    });
+    setProfileMsg({ error: '', success: '' });
+    setEditProfile(true);
+  };
+
+  const handleProfileSave = async (e) => {
+    e.preventDefault();
+    setProfileMsg({ error: '', success: '' });
+    try {
+      const payload = {
+        phone: profileForm.phone,
+        addressStreet: profileForm.addressStreet,
+        addressCity: profileForm.addressCity,
+        addressZip: profileForm.addressZip,
+        isPermanentResident: profileForm.isPermanentResident,
+      };
+      // Pokud ještě nebyl DOB měněn a hodnota se liší → pošli
+      const origDob = profile.dateOfBirth ? new Date(profile.dateOfBirth).toISOString().split('T')[0] : '';
+      if (!profile.dateOfBirthChanged && profileForm.dateOfBirth && profileForm.dateOfBirth !== origDob) {
+        payload.dateOfBirth = profileForm.dateOfBirth;
+      }
+      await api.updateMyProfile(payload);
+      const fresh = await api.getProfile();
+      setProfile(fresh);
+      setEditProfile(false);
+      setProfileMsg({ error: '', success: 'Profil uložen.' });
+    } catch (err) {
+      setProfileMsg({ error: err.error || 'Chyba při ukládání.', success: '' });
+    }
+  };
+
+  const maxDob = (() => {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() - 18);
+    return d.toISOString().split('T')[0];
+  })();
+
   useEffect(() => {
     if (!loading && !user) { router.push('/login'); return; }
     if (user) {
@@ -84,30 +139,108 @@ export default function ProfilePage() {
 
       {tab === 'profile' && profile && (
         <div className="card">
-          <div className="detail-grid">
-            <div>
-              <div className="detail-label">Jméno</div>
-              <div className="detail-value">{profile.firstName} {profile.lastName}</div>
-              <div className="detail-label">E-mail</div>
-              <div className="detail-value">{profile.email}</div>
-              <div className="detail-label">Telefon</div>
-              <div className="detail-value">{profile.phone}</div>
-              <div className="detail-label">Adresa</div>
-              <div className="detail-value">{profile.addressStreet}, {profile.addressCity} {profile.addressZip}</div>
-              <div className="detail-label">Datum narození</div>
-              <div className="detail-value">{new Date(profile.dateOfBirth).toLocaleDateString('cs-CZ')}</div>
-            </div>
-            <div>
-              <div className="detail-label">Stav registrace</div>
-              <div className="detail-value"><StatusBadge status={profile.registrationStatus} type="user" /></div>
-              <div className="detail-label">Role</div>
-              <div className="detail-value">{ROLES[profile.role] || profile.role}</div>
-              <div className="detail-label">Člen od</div>
-              <div className="detail-value">{profile.memberSince ? new Date(profile.memberSince).toLocaleDateString('cs-CZ') : 'Čeká na schválení'}</div>
-              <div className="detail-label">Trvalé bydliště ve V. Brodě</div>
-              <div className="detail-value">{profile.isPermanentResident ? 'Ano' : 'Ne'}</div>
-            </div>
-          </div>
+          {profileMsg.error && <div className="alert alert-error">{profileMsg.error}</div>}
+          {profileMsg.success && <div className="alert alert-success">{profileMsg.success}</div>}
+
+          {!editProfile ? (
+            <>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.5rem' }}>
+                <button className="btn btn-sm btn-secondary" onClick={openProfileEdit}>Upravit údaje</button>
+              </div>
+              <div className="detail-grid">
+                <div>
+                  <div className="detail-label">Jméno</div>
+                  <div className="detail-value">{profile.firstName} {profile.lastName}</div>
+                  <div className="detail-label">E-mail</div>
+                  <div className="detail-value">{profile.email}</div>
+                  <div className="detail-label">Telefon</div>
+                  <div className="detail-value">{profile.phone}</div>
+                  <div className="detail-label">Adresa</div>
+                  <div className="detail-value">{profile.addressStreet}, {profile.addressCity} {profile.addressZip}</div>
+                  <div className="detail-label">Datum narození</div>
+                  <div className="detail-value">
+                    {new Date(profile.dateOfBirth).toLocaleDateString('cs-CZ')}
+                    {profile.dateOfBirthChanged && <span style={{ fontSize: '0.8rem', color: 'var(--text-light)', marginLeft: 8 }}>(již změněno)</span>}
+                  </div>
+                </div>
+                <div>
+                  <div className="detail-label">Stav registrace</div>
+                  <div className="detail-value"><StatusBadge status={profile.registrationStatus} type="user" /></div>
+                  <div className="detail-label">Role</div>
+                  <div className="detail-value">{ROLES[profile.role] || profile.role}</div>
+                  <div className="detail-label">Člen od</div>
+                  <div className="detail-value">{profile.memberSince ? new Date(profile.memberSince).toLocaleDateString('cs-CZ') : 'Čeká na schválení'}</div>
+                  <div className="detail-label">Trvalé bydliště ve V. Brodě</div>
+                  <div className="detail-value">{profile.isPermanentResident ? 'Ano' : 'Ne'}</div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <form onSubmit={handleProfileSave} style={{ maxWidth: 600 }}>
+              <h3 style={{ marginBottom: '0.5rem' }}>Úprava osobních údajů</h3>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-light)', marginBottom: '1rem' }}>
+                Jméno, příjmení a e-mail může změnit pouze administrátor. Adresu a telefon můžete upravovat volně.
+                {!profile.dateOfBirthChanged
+                  ? ' Datum narození můžete opravit pouze jednou – pak už jen přes administrátora.'
+                  : ' Datum narození jste již jednou změnili, další úpravu provede administrátor.'}
+              </p>
+
+              <div className="form-group">
+                <label className="form-label">Telefon</label>
+                <input type="tel" className="form-input" value={profileForm.phone} onChange={e => setPf('phone', e.target.value)} required />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Ulice a č.p.</label>
+                <input className="form-input" value={profileForm.addressStreet} onChange={e => setPf('addressStreet', e.target.value)} required />
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Město</label>
+                  <input className="form-input" value={profileForm.addressCity} onChange={e => setPf('addressCity', e.target.value)} required />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">PSČ</label>
+                  <input className="form-input" value={profileForm.addressZip} onChange={e => setPf('addressZip', e.target.value)} required />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <div className="checkbox-group">
+                  <input type="checkbox" id="permResident" checked={profileForm.isPermanentResident} onChange={e => setPf('isPermanentResident', e.target.checked)} />
+                  <label htmlFor="permResident">Mám trvalé bydliště ve Vyšším Brodě</label>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Datum narození</label>
+                <input
+                  type="date"
+                  className="form-input"
+                  value={profileForm.dateOfBirth}
+                  max={maxDob}
+                  onChange={e => setPf('dateOfBirth', e.target.value)}
+                  disabled={profile.dateOfBirthChanged}
+                />
+                {profile.dateOfBirthChanged && (
+                  <span className="form-hint" style={{ color: 'var(--text-light)' }}>
+                    Datum narození už bylo jednou změněno – další úpravu může provést pouze administrátor.
+                  </span>
+                )}
+                {!profile.dateOfBirthChanged && (
+                  <span className="form-hint" style={{ color: 'var(--warning)' }}>
+                    Změna data narození je možná pouze jednou.
+                  </span>
+                )}
+              </div>
+
+              <div className="btn-group">
+                <button type="submit" className="btn btn-primary">Uložit</button>
+                <button type="button" className="btn btn-secondary" onClick={() => setEditProfile(false)}>Zrušit</button>
+              </div>
+            </form>
+          )}
 
           {profile.registrationStatus !== 'APPROVED' && (
             <div className="alert alert-warning" style={{ marginTop: '1rem' }}>

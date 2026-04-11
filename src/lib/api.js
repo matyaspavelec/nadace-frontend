@@ -28,6 +28,7 @@ export const api = {
   register: (data) => request('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
   verifyEmail: (token) => request(`/auth/verify-email?token=${token}`),
   getProfile: () => request('/auth/me'),
+  updateMyProfile: (data) => request('/auth/me', { method: 'PATCH', body: JSON.stringify(data) }),
   changePassword: (data) => request('/auth/change-password', { method: 'POST', body: JSON.stringify(data) }),
   forgotPassword: (email) => request('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) }),
   resetPassword: (data) => request('/auth/reset-password', { method: 'POST', body: JSON.stringify(data) }),
