@@ -50,7 +50,10 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.9rem', color: 'var(--text-light)' }}>
+        <p style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.9rem' }}>
+          <Link href="/forgot-password">Zapomněli jste heslo?</Link>
+        </p>
+        <p style={{ textAlign: 'center', marginTop: '0.5rem', fontSize: '0.9rem', color: 'var(--text-light)' }}>
           Nemáte účet? <Link href="/registrace">Zaregistrujte se</Link>
         </p>
       </div>

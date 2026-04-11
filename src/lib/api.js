@@ -29,6 +29,8 @@ export const api = {
   verifyEmail: (token) => request(`/auth/verify-email?token=${token}`),
   getProfile: () => request('/auth/me'),
   changePassword: (data) => request('/auth/change-password', { method: 'POST', body: JSON.stringify(data) }),
+  forgotPassword: (email) => request('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) }),
+  resetPassword: (data) => request('/auth/reset-password', { method: 'POST', body: JSON.stringify(data) }),
 
   // Users (admin)
   getUsers: (params = '') => request(`/users?${params}`),
