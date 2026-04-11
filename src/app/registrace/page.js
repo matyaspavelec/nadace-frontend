@@ -66,9 +66,7 @@ export default function RegisterPage() {
         lastName: form.lastName,
         dateOfBirth: `${form.birthYear}-01-01`,
         phone: form.phone,
-        addressStreet: '-',
         addressCity: city,
-        addressZip: '-',
         isPermanentResident: String(isResident),
         gdprConsent: String(form.gdprConsent),
         rulesConsent: String(form.rulesConsent),
@@ -216,7 +214,9 @@ export default function RegisterPage() {
           <div className="form-group">
             <div className="checkbox-group">
               <input type="checkbox" id="gdpr" checked={form.gdprConsent} onChange={e => set('gdprConsent', e.target.checked)} required />
-              <label htmlFor="gdpr">Souhlasím se zpracováním osobních údajů *</label>
+              <label htmlFor="gdpr">
+                Souhlasím se <Link href="/gdpr" target="_blank" style={{ textDecoration: 'underline' }}>zpracováním osobních údajů</Link> *
+              </label>
             </div>
           </div>
 
