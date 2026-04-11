@@ -139,7 +139,7 @@ export default function ProjectDetailPage() {
         {/* Sidebar */}
         <div>
           <div className="card" style={{ marginBottom: '1rem' }}>
-            <div className="detail-label"><MapPin size={14} style={{ verticalAlign: 'middle' }} /> Lokalita</div>
+            <div className="detail-label"><MapPin size={14} style={{ verticalAlign: 'middle' }} /> Město</div>
             <div className="detail-value">{project.location}</div>
 
             <div className="detail-label"><Banknote size={14} style={{ verticalAlign: 'middle' }} /> Rozpočet</div>

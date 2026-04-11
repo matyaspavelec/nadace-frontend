@@ -190,7 +190,7 @@ export default function AdminProjectDetailPage() {
               <div className="detail-value" style={{ fontWeight: 700, fontSize: '1.1rem' }}>{project.estimatedBudget?.toLocaleString('cs-CZ')} Kč</div>
               <div className="detail-label">Požadovaná podpora</div>
               <div className="detail-value">{project.requestedSupport?.toLocaleString('cs-CZ')} Kč</div>
-              <div className="detail-label">Lokalita</div>
+              <div className="detail-label">Město</div>
               <div className="detail-value">{project.location}</div>
               <div className="detail-label">Cílová skupina</div>
               <div className="detail-value">{project.targetGroup}</div>
@@ -320,8 +320,8 @@ export default function AdminProjectDetailPage() {
               <input className="form-input" value={internal.targetGroup} onChange={e => setInt('targetGroup', e.target.value)} />
             </div>
             <div className="form-group">
-              <label className="form-label">Místo realizace</label>
-              <input className="form-input" value={internal.location} onChange={e => setInt('location', e.target.value)} />
+              <label className="form-label">Město</label>
+              <input className="form-input" value={internal.location} onChange={e => setInt('location', e.target.value)} placeholder="Vyšší Brod" />
             </div>
           </div>
 
