@@ -53,6 +53,7 @@ export const api = {
   getAdminProject: (id) => request(`/projects/admin/${id}`),
   updateProjectStatus: (id, data) => request(`/projects/${id}/status`, { method: 'PATCH', body: JSON.stringify(data) }),
   updateProjectInternal: (id, data) => request(`/projects/${id}/internal`, { method: 'PATCH', body: JSON.stringify(data) }),
+  updateProjectDetail: (id, data) => request(`/projects/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
   requestCompletion: (id, data) => request(`/projects/${id}/request-completion`, { method: 'POST', body: JSON.stringify(data) }),
 
   // Reviews

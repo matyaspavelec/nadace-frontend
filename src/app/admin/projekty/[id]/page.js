@@ -19,13 +19,25 @@ export default function AdminProjectDetailPage() {
   const [votingStart, setVotingStart] = useState('');
   const [votingEnd, setVotingEnd] = useState('');
 
-  // Internal admin fields
+  // Internal admin fields (všechna editovatelná pole projektu)
   const [internal, setInternal] = useState({
-    targetGroup: '', location: '', estimatedBudget: '', implementedBy: '',
+    title: '', summary: '', description: '', benefitForCity: '',
+    targetGroup: '', location: '', estimatedBudget: '', requestedSupport: '',
+    realizationDate: '', implementedBy: '', isLongTerm: false,
     operatingCosts: '', maintainedBy: '', mainRisks: '',
-    previouslyDiscussed: '', estimatedBeneficiaries: '',
+    previouslyDiscussed: '', publicInterest: true, estimatedBeneficiaries: '',
+    category: 'OTHER', budgetSize: 'MEDIUM',
+    adminNote: '', foundationComment: '',
   });
   const setInt = (k, v) => setInternal(prev => ({ ...prev, [k]: v }));
+
+  // Detail edit mode
+  const [editDetail, setEditDetail] = useState(false);
+  const [detail, setDetail] = useState({
+    title: '', summary: '', description: '', benefitForCity: '',
+    requestedSupport: '', realizationDate: '', budgetSize: 'MEDIUM', category: 'OTHER',
+  });
+  const setDet = (k, v) => setDetail(prev => ({ ...prev, [k]: v }));
 
   // Review
   const [review, setReview] = useState({
@@ -40,15 +52,37 @@ export default function AdminProjectDetailPage() {
       setNewStatus(p.status);
       setFoundationComment(p.foundationComment || '');
       setInternal({
+        title: p.title || '',
+        summary: p.summary || '',
+        description: p.description || '',
+        benefitForCity: p.benefitForCity || '',
         targetGroup: p.targetGroup || '',
         location: p.location || '',
-        estimatedBudget: p.estimatedBudget || '',
+        estimatedBudget: p.estimatedBudget ?? '',
+        requestedSupport: p.requestedSupport ?? '',
+        realizationDate: p.realizationDate || '',
         implementedBy: p.implementedBy || '',
+        isLongTerm: !!p.isLongTerm,
         operatingCosts: p.operatingCosts || '',
         maintainedBy: p.maintainedBy || '',
         mainRisks: p.mainRisks || '',
         previouslyDiscussed: p.previouslyDiscussed || '',
-        estimatedBeneficiaries: p.estimatedBeneficiaries || '',
+        publicInterest: p.publicInterest ?? true,
+        estimatedBeneficiaries: p.estimatedBeneficiaries ?? '',
+        category: p.category || 'OTHER',
+        budgetSize: p.budgetSize || 'MEDIUM',
+        adminNote: p.adminNote || '',
+        foundationComment: p.foundationComment || '',
+      });
+      setDetail({
+        title: p.title || '',
+        summary: p.summary || '',
+        description: p.description || '',
+        benefitForCity: p.benefitForCity || '',
+        requestedSupport: p.requestedSupport || '',
+        realizationDate: p.realizationDate || '',
+        budgetSize: p.budgetSize || 'MEDIUM',
+        category: p.category || 'OTHER',
       });
       setLoading(false);
     }).catch(() => setLoading(false));
@@ -81,6 +115,15 @@ export default function AdminProjectDetailPage() {
     try {
       await api.updateProjectInternal(id, internal);
       setMsg('Interní údaje uloženy.');
+      load();
+    } catch (err) { setMsg(err.error || 'Chyba při ukládání.'); }
+  };
+
+  const saveDetail = async () => {
+    try {
+      await api.updateProjectDetail(id, detail);
+      setMsg('Projekt aktualizován.');
+      setEditDetail(false);
       load();
     } catch (err) { setMsg(err.error || 'Chyba při ukládání.'); }
   };
@@ -120,10 +163,13 @@ export default function AdminProjectDetailPage() {
         <button className={`tab ${tab === 'comments' ? 'active' : ''}`} onClick={() => setTab('comments')}>Komentáře ({project.comments?.length || 0})</button>
       </div>
 
-      {tab === 'detail' && (
+      {tab === 'detail' && !editDetail && (
         <div className="detail-grid">
           <div>
             <div className="card" style={{ marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.5rem' }}>
+                <button className="btn btn-sm btn-secondary" onClick={() => setEditDetail(true)}>Upravit</button>
+              </div>
               <div className="detail-label">Autor</div>
               <div className="detail-value">{project.author?.firstName} {project.author?.lastName} ({project.author?.email})</div>
               <div className="detail-label">Shrnutí</div>
@@ -161,12 +207,112 @@ export default function AdminProjectDetailPage() {
         </div>
       )}
 
+      {tab === 'detail' && editDetail && (
+        <div className="card" style={{ maxWidth: 800 }}>
+          <h3 style={{ marginBottom: '1rem' }}>Úprava projektu</h3>
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-light)', marginBottom: '1.5rem' }}>
+            Upravujete údaje vyplněné autorem projektu. Změny se uloží do auditního logu.
+          </p>
+
+          <div className="form-group">
+            <label className="form-label">Název</label>
+            <input className="form-input" value={detail.title} onChange={e => setDet('title', e.target.value)} />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Shrnutí</label>
+            <textarea className="form-textarea" value={detail.summary} onChange={e => setDet('summary', e.target.value)} style={{ minHeight: 80 }} />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Podrobný popis</label>
+            <textarea className="form-textarea" value={detail.description} onChange={e => setDet('description', e.target.value)} style={{ minHeight: 160 }} />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Přínos pro město</label>
+            <textarea className="form-textarea" value={detail.benefitForCity} onChange={e => setDet('benefitForCity', e.target.value)} style={{ minHeight: 80 }} />
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">Požadovaná podpora (Kč)</label>
+              <input type="number" className="form-input" value={detail.requestedSupport} onChange={e => setDet('requestedSupport', e.target.value)} min="0" />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Termín realizace</label>
+              <input className="form-input" value={detail.realizationDate} onChange={e => setDet('realizationDate', e.target.value)} />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">Kategorie</label>
+              <select className="form-select" value={detail.category} onChange={e => setDet('category', e.target.value)}>
+                {Object.entries(PROJECT_CATEGORIES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Velikost</label>
+              <select className="form-select" value={detail.budgetSize} onChange={e => setDet('budgetSize', e.target.value)}>
+                {Object.entries(BUDGET_SIZES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div className="btn-group" style={{ marginTop: '1rem' }}>
+            <button className="btn btn-primary" onClick={saveDetail}>Uložit</button>
+            <button className="btn btn-secondary" onClick={() => { setEditDetail(false); load(); }}>Zrušit</button>
+          </div>
+        </div>
+      )}
+
       {tab === 'internal' && (
-        <div className="card" style={{ maxWidth: 700 }}>
+        <div className="card" style={{ maxWidth: 800 }}>
           <h3 style={{ marginBottom: '1rem' }}>Interní údaje projektu</h3>
           <p style={{ fontSize: '0.85rem', color: 'var(--text-light)', marginBottom: '1.5rem' }}>
-            Tyto údaje vyplňuje administrátor. Nejsou součástí formuláře pro členy.
+            Administrátor může upravit všechny údaje projektu. Změny se zaznamenávají do auditního logu.
           </p>
+
+          <h4 style={{ marginBottom: '0.75rem' }}>Základní údaje</h4>
+
+          <div className="form-group">
+            <label className="form-label">Název projektu</label>
+            <input className="form-input" value={internal.title} onChange={e => setInt('title', e.target.value)} />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Shrnutí</label>
+            <textarea className="form-textarea" value={internal.summary} onChange={e => setInt('summary', e.target.value)} style={{ minHeight: 80 }} />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Podrobný popis</label>
+            <textarea className="form-textarea" value={internal.description} onChange={e => setInt('description', e.target.value)} style={{ minHeight: 160 }} />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Přínos pro město</label>
+            <textarea className="form-textarea" value={internal.benefitForCity} onChange={e => setInt('benefitForCity', e.target.value)} style={{ minHeight: 80 }} />
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">Kategorie</label>
+              <select className="form-select" value={internal.category} onChange={e => setInt('category', e.target.value)}>
+                {Object.entries(PROJECT_CATEGORIES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Velikost</label>
+              <select className="form-select" value={internal.budgetSize} onChange={e => setInt('budgetSize', e.target.value)}>
+                {Object.entries(BUDGET_SIZES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <hr style={{ margin: '1.5rem 0', borderColor: 'var(--border)' }} />
+          <h4 style={{ marginBottom: '0.75rem' }}>Realizace</h4>
 
           <div className="form-row">
             <div className="form-group">
@@ -185,13 +331,31 @@ export default function AdminProjectDetailPage() {
               <input type="number" className="form-input" value={internal.estimatedBudget} onChange={e => setInt('estimatedBudget', e.target.value)} min="0" />
             </div>
             <div className="form-group">
+              <label className="form-label">Požadovaná podpora (Kč)</label>
+              <input type="number" className="form-input" value={internal.requestedSupport} onChange={e => setInt('requestedSupport', e.target.value)} min="0" />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">Termín realizace</label>
+              <input className="form-input" value={internal.realizationDate} onChange={e => setInt('realizationDate', e.target.value)} />
+            </div>
+            <div className="form-group">
               <label className="form-label">Kdo bude realizovat</label>
               <input className="form-input" value={internal.implementedBy} onChange={e => setInt('implementedBy', e.target.value)} />
             </div>
           </div>
 
+          <div className="form-group">
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <input type="checkbox" checked={internal.isLongTerm} onChange={e => setInt('isLongTerm', e.target.checked)} />
+              Dlouhodobý projekt
+            </label>
+          </div>
+
           <hr style={{ margin: '1.5rem 0', borderColor: 'var(--border)' }} />
-          <h4 style={{ marginBottom: '1rem' }}>Doplňující informace</h4>
+          <h4 style={{ marginBottom: '0.75rem' }}>Doplňující informace</h4>
 
           <div className="form-group">
             <label className="form-label">Odhad provozních nákladů po dokončení</label>
@@ -213,9 +377,30 @@ export default function AdminProjectDetailPage() {
             <input className="form-input" value={internal.previouslyDiscussed} onChange={e => setInt('previouslyDiscussed', e.target.value)} />
           </div>
 
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">Odhadovaný počet příjemců</label>
+              <input type="number" className="form-input" value={internal.estimatedBeneficiaries} onChange={e => setInt('estimatedBeneficiaries', e.target.value)} min="0" />
+            </div>
+            <div className="form-group">
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 28 }}>
+                <input type="checkbox" checked={internal.publicInterest} onChange={e => setInt('publicInterest', e.target.checked)} />
+                Veřejný zájem
+              </label>
+            </div>
+          </div>
+
+          <hr style={{ margin: '1.5rem 0', borderColor: 'var(--border)' }} />
+          <h4 style={{ marginBottom: '0.75rem' }}>Administrativní poznámky</h4>
+
           <div className="form-group">
-            <label className="form-label">Odhadovaný počet příjemců</label>
-            <input type="number" className="form-input" value={internal.estimatedBeneficiaries} onChange={e => setInt('estimatedBeneficiaries', e.target.value)} min="0" />
+            <label className="form-label">Admin poznámka (interní)</label>
+            <textarea className="form-textarea" value={internal.adminNote} onChange={e => setInt('adminNote', e.target.value)} style={{ minHeight: 60 }} />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Komentář nadace (veřejný)</label>
+            <textarea className="form-textarea" value={internal.foundationComment} onChange={e => setInt('foundationComment', e.target.value)} style={{ minHeight: 60 }} />
           </div>
 
           <button className="btn btn-primary" onClick={saveInternal} style={{ marginTop: '1rem' }}>Uložit interní údaje</button>
