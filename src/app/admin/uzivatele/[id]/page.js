@@ -134,8 +134,12 @@ export default function AdminUserDetailPage() {
                 <div className="detail-value">{user.phone}</div>
                 <div className="detail-label">Rok narození</div>
                 <div className="detail-value">{user.dateOfBirth ? new Date(user.dateOfBirth).getFullYear() : '-'}</div>
-                <div className="detail-label">Adresa</div>
-                <div className="detail-value">{user.addressStreet}, {user.addressCity} {user.addressZip}</div>
+                <div className="detail-label">Bydliště</div>
+                <div className="detail-value">
+                  {[user.addressStreet, user.addressCity, user.addressZip]
+                    .filter(x => x && x !== '-')
+                    .join(', ') || '—'}
+                </div>
                 <div className="detail-label">Trvalé bydliště ve V. Brodě</div>
                 <div className="detail-value">{user.isPermanentResident ? 'Ano' : 'Ne'}</div>
                 <div className="detail-label">Registrace</div>

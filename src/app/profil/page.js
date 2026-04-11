@@ -77,9 +77,7 @@ export default function ProfilePage() {
     try {
       const payload = {
         phone: profileForm.phone,
-        addressStreet: profileForm.addressStreet,
         addressCity: profileForm.addressCity,
-        addressZip: profileForm.addressZip,
         isPermanentResident: profileForm.isPermanentResident,
       };
       // Pokud ještě nebyl rok narození měněn a hodnota se liší → pošli
@@ -181,9 +179,13 @@ export default function ProfilePage() {
                   <div className="detail-label">E-mail</div>
                   <div className="detail-value">{profile.email}</div>
                   <div className="detail-label">Telefon</div>
-                  <div className="detail-value">{profile.phone}</div>
-                  <div className="detail-label">Adresa</div>
-                  <div className="detail-value">{profile.addressStreet}, {profile.addressCity} {profile.addressZip}</div>
+                  <div className="detail-value">{profile.phone || '—'}</div>
+                  <div className="detail-label">Bydliště</div>
+                  <div className="detail-value">
+                    {[profile.addressStreet, profile.addressCity, profile.addressZip]
+                      .filter(x => x && x !== '-')
+                      .join(', ') || '—'}
+                  </div>
                   <div className="detail-label">Rok narození</div>
                   <div className="detail-value">
                     {new Date(profile.dateOfBirth).getFullYear()}
@@ -218,19 +220,11 @@ export default function ProfilePage() {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Ulice a č.p.</label>
-                <input className="form-input" value={profileForm.addressStreet} onChange={e => setPf('addressStreet', e.target.value)} required />
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Město</label>
-                  <input className="form-input" value={profileForm.addressCity} onChange={e => setPf('addressCity', e.target.value)} required />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">PSČ</label>
-                  <input className="form-input" value={profileForm.addressZip} onChange={e => setPf('addressZip', e.target.value)} required />
-                </div>
+                <label className="form-label">Obec / město</label>
+                <input className="form-input" value={profileForm.addressCity} onChange={e => setPf('addressCity', e.target.value)} required />
+                <span className="form-hint" style={{ color: 'var(--text-light)', fontSize: '0.8rem' }}>
+                  Stačí jen obec – ulici a PSČ z důvodu GDPR neshromažďujeme.
+                </span>
               </div>
 
               <div className="form-group">
