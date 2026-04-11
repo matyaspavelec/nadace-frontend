@@ -23,7 +23,7 @@ export default function ProfilePage() {
   const [editProfile, setEditProfile] = useState(false);
   const [profileForm, setProfileForm] = useState({
     phone: '', addressStreet: '', addressCity: '', addressZip: '',
-    isPermanentResident: false, dateOfBirth: '',
+    isPermanentResident: false, birthYear: '',
   });
   const [profileMsg, setProfileMsg] = useState({ error: '', success: '' });
   const setPf = (k, v) => setProfileForm(prev => ({ ...prev, [k]: v }));
@@ -36,7 +36,7 @@ export default function ProfilePage() {
       addressCity: profile.addressCity || '',
       addressZip: profile.addressZip || '',
       isPermanentResident: !!profile.isPermanentResident,
-      dateOfBirth: profile.dateOfBirth ? new Date(profile.dateOfBirth).toISOString().split('T')[0] : '',
+      birthYear: profile.dateOfBirth ? String(new Date(profile.dateOfBirth).getFullYear()) : '',
     });
     setProfileMsg({ error: '', success: '' });
     setEditProfile(true);
@@ -53,10 +53,10 @@ export default function ProfilePage() {
         addressZip: profileForm.addressZip,
         isPermanentResident: profileForm.isPermanentResident,
       };
-      // Pokud ještě nebyl DOB měněn a hodnota se liší → pošli
-      const origDob = profile.dateOfBirth ? new Date(profile.dateOfBirth).toISOString().split('T')[0] : '';
-      if (!profile.dateOfBirthChanged && profileForm.dateOfBirth && profileForm.dateOfBirth !== origDob) {
-        payload.dateOfBirth = profileForm.dateOfBirth;
+      // Pokud ještě nebyl rok narození měněn a hodnota se liší → pošli
+      const origYear = profile.dateOfBirth ? String(new Date(profile.dateOfBirth).getFullYear()) : '';
+      if (!profile.dateOfBirthChanged && profileForm.birthYear && profileForm.birthYear !== origYear) {
+        payload.dateOfBirth = `${profileForm.birthYear}-01-01`;
       }
       await api.updateMyProfile(payload);
       const fresh = await api.getProfile();
@@ -68,11 +68,9 @@ export default function ProfilePage() {
     }
   };
 
-  const maxDob = (() => {
-    const d = new Date();
-    d.setFullYear(d.getFullYear() - 18);
-    return d.toISOString().split('T')[0];
-  })();
+  const currentYear = new Date().getFullYear();
+  const birthYears = [];
+  for (let y = currentYear - 18; y >= currentYear - 100; y--) birthYears.push(y);
 
   useEffect(() => {
     if (!loading && !user) { router.push('/login'); return; }
@@ -157,9 +155,9 @@ export default function ProfilePage() {
                   <div className="detail-value">{profile.phone}</div>
                   <div className="detail-label">Adresa</div>
                   <div className="detail-value">{profile.addressStreet}, {profile.addressCity} {profile.addressZip}</div>
-                  <div className="detail-label">Datum narození</div>
+                  <div className="detail-label">Rok narození</div>
                   <div className="detail-value">
-                    {new Date(profile.dateOfBirth).toLocaleDateString('cs-CZ')}
+                    {new Date(profile.dateOfBirth).getFullYear()}
                     {profile.dateOfBirthChanged && <span style={{ fontSize: '0.8rem', color: 'var(--text-light)', marginLeft: 8 }}>(již změněno)</span>}
                   </div>
                 </div>
@@ -214,23 +212,24 @@ export default function ProfilePage() {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Datum narození</label>
-                <input
-                  type="date"
+                <label className="form-label">Rok narození</label>
+                <select
                   className="form-input"
-                  value={profileForm.dateOfBirth}
-                  max={maxDob}
-                  onChange={e => setPf('dateOfBirth', e.target.value)}
+                  value={profileForm.birthYear}
+                  onChange={e => setPf('birthYear', e.target.value)}
                   disabled={profile.dateOfBirthChanged}
-                />
+                >
+                  <option value="">Vyberte...</option>
+                  {birthYears.map(y => <option key={y} value={y}>{y}</option>)}
+                </select>
                 {profile.dateOfBirthChanged && (
                   <span className="form-hint" style={{ color: 'var(--text-light)' }}>
-                    Datum narození už bylo jednou změněno – další úpravu může provést pouze administrátor.
+                    Rok narození už byl jednou změněn – další úpravu může provést pouze administrátor.
                   </span>
                 )}
                 {!profile.dateOfBirthChanged && (
                   <span className="form-hint" style={{ color: 'var(--warning)' }}>
-                    Změna data narození je možná pouze jednou.
+                    Změna roku narození je možná pouze jednou.
                   </span>
                 )}
               </div>

@@ -22,10 +22,14 @@ export default function AdminUserDetailPage() {
   // Editace osobních údajů
   const [editProfile, setEditProfile] = useState(false);
   const [profile, setProfile] = useState({
-    firstName: '', lastName: '', email: '', phone: '', dateOfBirth: '',
+    firstName: '', lastName: '', email: '', phone: '', birthYear: '',
     addressStreet: '', addressCity: '', addressZip: '', isPermanentResident: false,
   });
   const setProf = (k, v) => setProfile(prev => ({ ...prev, [k]: v }));
+
+  const currentYear = new Date().getFullYear();
+  const birthYears = [];
+  for (let y = currentYear - 18; y >= currentYear - 100; y--) birthYears.push(y);
 
   const load = () => {
     api.getUser(id).then(u => {
@@ -38,7 +42,7 @@ export default function AdminUserDetailPage() {
         lastName: u.lastName || '',
         email: u.email || '',
         phone: u.phone || '',
-        dateOfBirth: u.dateOfBirth ? new Date(u.dateOfBirth).toISOString().split('T')[0] : '',
+        birthYear: u.dateOfBirth ? String(new Date(u.dateOfBirth).getFullYear()) : '',
         addressStreet: u.addressStreet || '',
         addressCity: u.addressCity || '',
         addressZip: u.addressZip || '',
@@ -50,7 +54,10 @@ export default function AdminUserDetailPage() {
 
   const saveProfile = async () => {
     try {
-      await api.updateUserProfile(id, profile);
+      const { birthYear, ...rest } = profile;
+      const payload = { ...rest };
+      if (birthYear) payload.dateOfBirth = `${birthYear}-01-01`;
+      await api.updateUserProfile(id, payload);
       setMsg('Osobní údaje uloženy.');
       setEditProfile(false);
       load();
@@ -125,8 +132,8 @@ export default function AdminUserDetailPage() {
                 <div className="detail-value">{user.email} {user.emailVerified ? '(ověřen)' : '(neověřen)'}</div>
                 <div className="detail-label">Telefon</div>
                 <div className="detail-value">{user.phone}</div>
-                <div className="detail-label">Datum narození</div>
-                <div className="detail-value">{user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString('cs-CZ') : '-'}</div>
+                <div className="detail-label">Rok narození</div>
+                <div className="detail-value">{user.dateOfBirth ? new Date(user.dateOfBirth).getFullYear() : '-'}</div>
                 <div className="detail-label">Adresa</div>
                 <div className="detail-value">{user.addressStreet}, {user.addressCity} {user.addressZip}</div>
                 <div className="detail-label">Trvalé bydliště ve V. Brodě</div>
@@ -156,8 +163,11 @@ export default function AdminUserDetailPage() {
                     <input className="form-input" value={profile.phone} onChange={e => setProf('phone', e.target.value)} />
                   </div>
                   <div className="form-group">
-                    <label className="form-label">Datum narození</label>
-                    <input type="date" className="form-input" value={profile.dateOfBirth} onChange={e => setProf('dateOfBirth', e.target.value)} />
+                    <label className="form-label">Rok narození</label>
+                    <select className="form-input" value={profile.birthYear} onChange={e => setProf('birthYear', e.target.value)}>
+                      <option value="">Vyberte...</option>
+                      {birthYears.map(y => <option key={y} value={y}>{y}</option>)}
+                    </select>
                   </div>
                 </div>
                 <div className="form-group">
