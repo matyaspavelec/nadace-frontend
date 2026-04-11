@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
+import { logError } from '@/lib/errors';
 
 export default function AdminAuditPage() {
   const [logs, setLogs] = useState([]);
@@ -16,7 +17,7 @@ export default function AdminAuditPage() {
       setLogs(d.logs);
       setTotal(d.total);
       setTotalPages(d.totalPages);
-    }).catch(() => {});
+    }).catch(logError('admin-audit/logs'));
   };
 
   useEffect(() => { load(); }, [page, actionFilter]);

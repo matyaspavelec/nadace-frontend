@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { logError } from '@/lib/errors';
 import { PROJECT_CATEGORIES, PROJECT_STATUSES } from '@/lib/constants';
 import StatusBadge from '@/components/StatusBadge';
 
@@ -21,7 +22,7 @@ export default function ProjectsPage() {
       setProjects(d.projects);
       setTotal(d.total);
       setTotalPages(d.totalPages);
-    }).catch(() => {});
+    }).catch(logError('projekty/list'));
   };
 
   useEffect(() => { load(); }, [page, category, status]);

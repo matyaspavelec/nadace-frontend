@@ -6,7 +6,9 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import StatusBadge from '@/components/StatusBadge';
 import { REGISTRATION_STATUSES, TRUST_LEVELS, ROLES } from '@/lib/constants';
-import { User, FolderOpen, Bell, Key, CheckCircle, AlertTriangle } from 'lucide-react';
+import { validatePasswordPair } from '@/lib/validators';
+import { logError } from '@/lib/errors';
+import { User, FolderOpen, Bell, Key, CheckCircle, AlertTriangle, Download } from 'lucide-react';
 
 export default function ProfilePage() {
   const { user, loading, loadUser, logout } = useAuth();
@@ -17,15 +19,24 @@ export default function ProfilePage() {
   const [deleteForm, setDeleteForm] = useState({ password: '', confirm: '' });
   const [deleteMsg, setDeleteMsg] = useState({ error: '', loading: false });
 
-  // Resend e-mail verifikace
-  const [resendMsg, setResendMsg] = useState('');
-  const handleResendVerification = async () => {
-    setResendMsg('');
+  const handleExportData = async () => {
     try {
-      await api.resendVerification(profile.email);
-      setResendMsg('Pokud váš e-mail nebyl ověřený, odeslali jsme nový ověřovací odkaz.');
+      const token = localStorage.getItem('token');
+      const res = await fetch('/api/auth/export-my-data', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error('export failed');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `nadace-export-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
     } catch {
-      setResendMsg('Pokud váš e-mail nebyl ověřený, odeslali jsme nový ověřovací odkaz.');
+      alert('Export se nepodařil. Zkuste to prosím později.');
     }
   };
 
@@ -102,9 +113,9 @@ export default function ProfilePage() {
   useEffect(() => {
     if (!loading && !user) { router.push('/login'); return; }
     if (user) {
-      api.getProfile().then(setProfile).catch(() => {});
-      api.getMyProjects().then(setMyProjects).catch(() => {});
-      api.getNotifications().then(setNotifications).catch(() => {});
+      api.getProfile().then(setProfile).catch(logError('profil/profile'));
+      api.getMyProjects().then(setMyProjects).catch(logError('profil/projects'));
+      api.getNotifications().then(setNotifications).catch(logError('profil/notifications'));
     }
   }, [user, loading, router]);
 
@@ -123,7 +134,8 @@ export default function ProfilePage() {
   const handlePasswordChange = async (e) => {
     e.preventDefault();
     setPwMsg({ error: '', success: '' });
-    if (pwForm.newPassword !== pwForm.confirm) return setPwMsg({ error: 'Hesla se neshodují.', success: '' });
+    const pwError = validatePasswordPair(pwForm.newPassword, pwForm.confirm);
+    if (pwError) return setPwMsg({ error: pwError, success: '' });
     try {
       await api.changePassword({ currentPassword: pwForm.currentPassword, newPassword: pwForm.newPassword });
       setPwMsg({ error: '', success: 'Heslo bylo změněno.' });
@@ -264,10 +276,33 @@ export default function ProfilePage() {
             </form>
           )}
 
-          {/* ===== DANGER ZONE – GDPR právo na výmaz ===== */}
+          {/* ===== EXPORT DAT – GDPR čl. 20 ===== */}
           {!editProfile && (
             <div style={{
               marginTop: '2rem',
+              padding: '1rem 1.25rem',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius)',
+              background: '#f8fafc',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                <Download size={18} />
+                <strong>Export mých dat</strong>
+              </div>
+              <p style={{ fontSize: '0.88rem', color: 'var(--text-light)', marginBottom: '0.75rem' }}>
+                Stáhněte si veškeré osobní údaje, které o vás vedeme, ve strojově čitelném
+                formátu JSON (čl. 20 GDPR – právo na přenositelnost údajů).
+              </p>
+              <button className="btn btn-sm btn-secondary" onClick={handleExportData}>
+                Stáhnout JSON
+              </button>
+            </div>
+          )}
+
+          {/* ===== DANGER ZONE – GDPR právo na výmaz ===== */}
+          {!editProfile && (
+            <div style={{
+              marginTop: '1rem',
               padding: '1rem 1.25rem',
               border: '1px solid var(--danger, #dc2626)',
               borderRadius: 'var(--radius)',
@@ -340,20 +375,7 @@ export default function ProfilePage() {
 
           {profile.registrationStatus !== 'APPROVED' && (
             <div className="alert alert-warning" style={{ marginTop: '1rem' }}>
-              {profile.registrationStatus === 'NEW' && (
-                <div>
-                  <div>Ověřte prosím svůj e-mail. Bez ověření vás administrátor nemůže schválit.</div>
-                  <button
-                    type="button"
-                    className="btn btn-sm btn-secondary"
-                    style={{ marginTop: 8 }}
-                    onClick={handleResendVerification}
-                  >
-                    Znovu odeslat ověřovací e-mail
-                  </button>
-                  {resendMsg && <div style={{ marginTop: 6, fontSize: '0.85rem' }}>{resendMsg}</div>}
-                </div>
-              )}
+              {profile.registrationStatus === 'NEW' && 'Vaše registrace čeká na kontrolu administrátorem.'}
               {profile.registrationStatus === 'PENDING_REVIEW' && 'Vaše registrace čeká na kontrolu administrátorem.'}
               {profile.registrationStatus === 'INVITED_FOR_INTERVIEW' && 'Byli jste pozváni k osobnímu pohovoru. Budeme vás kontaktovat.'}
               {profile.registrationStatus === 'REJECTED' && 'Vaše registrace byla zamítnuta.'}

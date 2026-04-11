@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { logError } from '@/lib/errors';
 import { useAuth } from '@/lib/auth';
 import { PROJECT_CATEGORIES } from '@/lib/constants';
 import StatusBadge from '@/components/StatusBadge';
@@ -14,9 +15,9 @@ export default function HomePage() {
   const [pages, setPages] = useState([]);
 
   useEffect(() => {
-    api.getPublicProjects('limit=3').then(d => setProjects(d.projects)).catch(() => {});
-    api.getNews('limit=3').then(d => setNews(d.articles)).catch(() => {});
-    api.getPages().then(setPages).catch(() => {});
+    api.getPublicProjects('limit=3').then(d => setProjects(d.projects)).catch(logError('home/projects'));
+    api.getNews('limit=3').then(d => setNews(d.articles)).catch(logError('home/news'));
+    api.getPages().then(setPages).catch(logError('home/pages'));
   }, []);
 
   return (

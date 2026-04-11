@@ -2,6 +2,7 @@
 import { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { api } from '@/lib/api';
+import { validatePasswordPair } from '@/lib/validators';
 import Link from 'next/link';
 import { KeyRound } from 'lucide-react';
 
@@ -31,13 +32,9 @@ function ResetPasswordForm() {
     e.preventDefault();
     setError('');
 
-    if (password !== passwordConfirm) {
-      setError('Hesla se neshodují.');
-      return;
-    }
-
-    if (password.length < 8) {
-      setError('Heslo musí mít alespoň 8 znaků.');
+    const pwError = validatePasswordPair(password, passwordConfirm);
+    if (pwError) {
+      setError(pwError);
       return;
     }
 

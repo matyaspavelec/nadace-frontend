@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { api } from '@/lib/api';
+import { validatePasswordPair } from '@/lib/validators';
 import Link from 'next/link';
 import { UserPlus } from 'lucide-react';
 
@@ -41,12 +42,8 @@ export default function RegisterPage() {
     e.preventDefault();
     setError('');
 
-    if (form.password !== form.passwordConfirm) {
-      return setError('Hesla se neshodují.');
-    }
-    if (form.password.length < 8) {
-      return setError('Heslo musí mít alespoň 8 znaků.');
-    }
+    const pwError = validatePasswordPair(form.password, form.passwordConfirm);
+    if (pwError) return setError(pwError);
     if (!form.birthYear) {
       return setError('Vyberte rok narození.');
     }

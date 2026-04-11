@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
+import { logError } from '@/lib/errors';
 
 export default function AdminCMSPage() {
   const [tab, setTab] = useState('pages');
@@ -12,9 +13,9 @@ export default function AdminCMSPage() {
   const [msg, setMsg] = useState('');
 
   useEffect(() => {
-    api.getAdminPages().then(setPages).catch(() => {});
-    api.getNews('limit=50').then(d => setNews(d.articles || [])).catch(() => {});
-    api.getDocuments().then(setDocuments).catch(() => {});
+    api.getAdminPages().then(setPages).catch(logError('admin-cms/pages'));
+    api.getNews('limit=50').then(d => setNews(d.articles || [])).catch(logError('admin-cms/news'));
+    api.getDocuments().then(setDocuments).catch(logError('admin-cms/documents'));
   }, []);
 
   const savePage = async (e) => {

@@ -1,13 +1,14 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
+import { logError } from '@/lib/errors';
 import { Users, FolderOpen, Vote, MessageSquare } from 'lucide-react';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
 
   useEffect(() => {
-    api.getStats().then(setStats).catch(() => {});
+    api.getStats().then(setStats).catch(logError('admin/stats'));
   }, []);
 
   if (!stats) return <div className="loading"><div className="spinner" />Načítání...</div>;

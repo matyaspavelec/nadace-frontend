@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
+import { logError } from '@/lib/errors';
 import { INTERVIEW_RESULTS } from '@/lib/constants';
 import Link from 'next/link';
 
@@ -13,7 +14,7 @@ export default function AdminInterviewsPage() {
 
   const load = () => {
     const params = showUpcoming ? 'upcoming=true' : '';
-    api.getInterviews(params).then(setInterviews).catch(() => {});
+    api.getInterviews(params).then(setInterviews).catch(logError('admin-pohovory/list'));
   };
 
   useEffect(() => { load(); }, [showUpcoming]);

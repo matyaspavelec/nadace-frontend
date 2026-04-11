@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { logError } from '@/lib/errors';
 import { REGISTRATION_STATUSES, ROLES } from '@/lib/constants';
 import StatusBadge from '@/components/StatusBadge';
 
@@ -21,7 +22,7 @@ export default function AdminUsersPage() {
       setUsers(d.users);
       setTotal(d.total);
       setTotalPages(d.totalPages);
-    }).catch(() => {});
+    }).catch(logError('admin-users/list'));
   };
 
   useEffect(() => { load(); }, [page, status]);

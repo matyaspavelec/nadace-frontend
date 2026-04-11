@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { api } from '@/lib/api';
+import { logError } from '@/lib/errors';
 import { useAuth } from '@/lib/auth';
 import StatusBadge from '@/components/StatusBadge';
 import { PROJECT_CATEGORIES, BUDGET_SIZES } from '@/lib/constants';
@@ -26,7 +27,7 @@ export default function ProjectDetailPage() {
     }).catch(() => setLoading(false));
 
     if (user) {
-      api.getMyVote(id).then(d => setMyVote(d.vote)).catch(() => {});
+      api.getMyVote(id).then(d => setMyVote(d.vote)).catch(logError('projekt-detail/myVote'));
     }
   }, [id, user]);
 
