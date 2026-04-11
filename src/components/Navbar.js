@@ -73,6 +73,24 @@ export default function Navbar() {
             </>
           ) : (
             <>
+              <Link href="/profil" className="navbar-link" onClick={() => setOpen(false)}>
+                <User size={16} style={{ marginRight: 4, verticalAlign: 'middle' }} />
+                Profil
+              </Link>
+              {showAdmin && (
+                <Link href="/admin" className="navbar-link" onClick={() => setOpen(false)}>
+                  <Shield size={16} style={{ marginRight: 4, verticalAlign: 'middle' }} />
+                  Admin
+                </Link>
+              )}
+              <button
+                className="navbar-link"
+                onClick={() => { logout(); setOpen(false); window.location.href = '/'; }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'inherit' }}
+              >
+                <LogOut size={16} style={{ marginRight: 4, verticalAlign: 'middle' }} />
+                Odhlásit
+              </button>
               <div ref={dropdownRef} style={{ position: 'relative' }}>
                 <button
                   className="navbar-link"
@@ -145,24 +163,6 @@ export default function Navbar() {
                   </div>
                 )}
               </div>
-              <Link href="/profil" className="navbar-link" onClick={() => setOpen(false)}>
-                <User size={16} style={{ marginRight: 4, verticalAlign: 'middle' }} />
-                Profil
-              </Link>
-              {showAdmin && (
-                <Link href="/admin" className="navbar-link" onClick={() => setOpen(false)}>
-                  <Shield size={16} style={{ marginRight: 4, verticalAlign: 'middle' }} />
-                  Admin
-                </Link>
-              )}
-              <button
-                className="navbar-link"
-                onClick={() => { logout(); setOpen(false); window.location.href = '/'; }}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'inherit' }}
-              >
-                <LogOut size={16} style={{ marginRight: 4, verticalAlign: 'middle' }} />
-                Odhlásit
-              </button>
             </>
           )}
         </div>
