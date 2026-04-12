@@ -10,7 +10,6 @@ export default function NewProjectPage() {
   const router = useRouter();
   const [form, setForm] = useState({
     title: '', summary: '', description: '', benefitForCity: '',
-    requestedSupport: '',
     realizationDate: '', isLongTerm: false,
     publicInterest: true,
     category: 'OTHER', budgetSize: 'MEDIUM', declaration: false,
@@ -97,15 +96,9 @@ export default function NewProjectPage() {
         <div className="card" style={{ marginBottom: '1.5rem' }}>
           <h3 style={{ marginBottom: '1rem' }}>Rozpočet a realizace</h3>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">Požadovaná podpora od nadace (Kč) *</label>
-              <input type="number" className="form-input" value={form.requestedSupport} onChange={e => set('requestedSupport', e.target.value)} required min="0" />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Termín realizace *</label>
-              <input className="form-input" value={form.realizationDate} onChange={e => set('realizationDate', e.target.value)} required placeholder="např. jaro 2027" />
-            </div>
+          <div className="form-group">
+            <label className="form-label">Termín realizace *</label>
+            <input className="form-input" value={form.realizationDate} onChange={e => set('realizationDate', e.target.value)} required placeholder="např. jaro 2027" />
           </div>
 
           <div className="form-group">

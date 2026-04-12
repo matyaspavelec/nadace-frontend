@@ -151,20 +151,8 @@ export default function ProjectDetailPage() {
               {project.estimatedBudget?.toLocaleString('cs-CZ')} Kč
             </div>
 
-            <div className="detail-label">Požadovaná podpora</div>
-            <div className="detail-value">{project.requestedSupport?.toLocaleString('cs-CZ')} Kč</div>
-
             <div className="detail-label"><Calendar size={14} style={{ verticalAlign: 'middle' }} /> Termín realizace</div>
             <div className="detail-value">{project.realizationDate}</div>
-
-            <div className="detail-label">Cílová skupina</div>
-            <div className="detail-value">{project.targetGroup}</div>
-
-            <div className="detail-label">Realizátor</div>
-            <div className="detail-value">{project.implementedBy}</div>
-
-            <div className="detail-label">Charakter</div>
-            <div className="detail-value">{project.isLongTerm ? 'Dlouhodobý' : 'Jednorázový'}</div>
           </div>
 
           {/* Hlasování */}

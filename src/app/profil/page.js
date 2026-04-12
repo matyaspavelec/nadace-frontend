@@ -62,8 +62,7 @@ export default function ProfilePage() {
   // Editace profilu
   const [editProfile, setEditProfile] = useState(false);
   const [profileForm, setProfileForm] = useState({
-    phone: '', addressStreet: '', addressCity: '', addressZip: '',
-    isPermanentResident: false, birthYear: '',
+    phone: '', addressCity: '', birthYear: '',
   });
   const [profileMsg, setProfileMsg] = useState({ error: '', success: '' });
   const setPf = (k, v) => setProfileForm(prev => ({ ...prev, [k]: v }));
@@ -72,10 +71,7 @@ export default function ProfilePage() {
     if (!profile) return;
     setProfileForm({
       phone: profile.phone || '',
-      addressStreet: profile.addressStreet || '',
       addressCity: profile.addressCity || '',
-      addressZip: profile.addressZip || '',
-      isPermanentResident: !!profile.isPermanentResident,
       birthYear: profile.dateOfBirth ? String(new Date(profile.dateOfBirth).getFullYear()) : '',
     });
     setProfileMsg({ error: '', success: '' });
@@ -89,7 +85,7 @@ export default function ProfilePage() {
       const payload = {
         phone: profileForm.phone,
         addressCity: profileForm.addressCity,
-        isPermanentResident: profileForm.isPermanentResident,
+        addressCity: profileForm.addressCity,
       };
       // Pokud ještě nebyl rok narození měněn a hodnota se liší → pošli
       const origYear = profile.dateOfBirth ? String(new Date(profile.dateOfBirth).getFullYear()) : '';
@@ -194,9 +190,7 @@ export default function ProfilePage() {
                   <div className="detail-value">{profile.phone || '—'}</div>
                   <div className="detail-label">Bydliště</div>
                   <div className="detail-value">
-                    {[profile.addressStreet, profile.addressCity, profile.addressZip]
-                      .filter(x => x && x !== '-')
-                      .join(', ') || '—'}
+                    {profile.addressCity || '—'}
                   </div>
                   <div className="detail-label">Rok narození</div>
                   <div className="detail-value">
@@ -211,8 +205,6 @@ export default function ProfilePage() {
                   <div className="detail-value">{ROLES[profile.role] || profile.role}</div>
                   <div className="detail-label">Člen od</div>
                   <div className="detail-value">{profile.memberSince ? new Date(profile.memberSince).toLocaleDateString('cs-CZ') : 'Čeká na schválení'}</div>
-                  <div className="detail-label">Trvalé bydliště ve V. Brodě</div>
-                  <div className="detail-value">{profile.isPermanentResident ? 'Ano' : 'Ne'}</div>
                 </div>
               </div>
             </>
@@ -239,12 +231,6 @@ export default function ProfilePage() {
                 </span>
               </div>
 
-              <div className="form-group">
-                <div className="checkbox-group">
-                  <input type="checkbox" id="permResident" checked={profileForm.isPermanentResident} onChange={e => setPf('isPermanentResident', e.target.checked)} />
-                  <label htmlFor="permResident">Mám trvalé bydliště ve Vyšším Brodě</label>
-                </div>
-              </div>
 
               <div className="form-group">
                 <label className="form-label">Rok narození</label>

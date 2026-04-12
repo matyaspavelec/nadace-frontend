@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/errors';
+import Link from 'next/link';
 import { Users, FolderOpen, Vote, MessageSquare } from 'lucide-react';
 
 export default function AdminDashboard() {
@@ -18,11 +19,11 @@ export default function AdminDashboard() {
       <h1 className="page-title">Administrace</h1>
 
       <div className="stats-grid">
-        <div className="card stat-card">
+        <Link href="/admin/uzivatele" className="card stat-card" style={{ textDecoration: 'none', color: 'inherit' }}>
           <Users size={28} style={{ color: 'var(--primary)', marginBottom: 4 }} />
           <div className="stat-value">{stats.users.total}</div>
           <div className="stat-label">Uživatelů celkem</div>
-        </div>
+        </Link>
         <div className="card stat-card">
           <div className="stat-value" style={{ color: 'var(--warning)' }}>{stats.users.pending}</div>
           <div className="stat-label">Čeká na schválení</div>

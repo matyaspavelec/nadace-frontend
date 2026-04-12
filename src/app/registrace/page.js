@@ -10,8 +10,7 @@ export default function RegisterPage() {
     email: '', password: '', passwordConfirm: '',
     firstName: '', lastName: '', birthYear: '',
     phone: '',
-    residence: 'Vyšší Brod',
-    otherCity: '',
+    addressCity: '',
     gdprConsent: false, rulesConsent: false,
   });
 
@@ -29,6 +28,10 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const citySuggestions = VYSSI_BROD_PARTS.filter(p =>
+    form.addressCity && p.toLowerCase().includes(form.addressCity.toLowerCase())
+  );
 
   const set = (k, v) => setForm(prev => ({ ...prev, [k]: v }));
 
@@ -47,15 +50,12 @@ export default function RegisterPage() {
     if (!form.birthYear) {
       return setError('Vyberte rok narození.');
     }
-    const isOther = form.residence === 'OTHER';
-    if (isOther && !form.otherCity.trim()) {
-      return setError('Uveďte obec trvalého pobytu.');
+    if (!form.addressCity.trim()) {
+      return setError('Uveďte obec.');
     }
 
     setLoading(true);
     try {
-      const city = isOther ? form.otherCity.trim() : form.residence;
-      const isResident = !isOther;
       await api.register({
         email: form.email,
         password: form.password,
@@ -63,8 +63,7 @@ export default function RegisterPage() {
         lastName: form.lastName,
         dateOfBirth: `${form.birthYear}-01-01`,
         phone: form.phone,
-        addressCity: city,
-        isPermanentResident: String(isResident),
+        addressCity: form.addressCity.trim(),
         gdprConsent: String(form.gdprConsent),
         rulesConsent: String(form.rulesConsent),
       });
@@ -148,62 +147,34 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          {/* ===== BYDLIŠTĚ – jediná vizuálně oddělená sekce ===== */}
-          <div style={{
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--radius)',
-            padding: '1rem 1.25rem',
-            marginBottom: '1rem',
-            background: '#fafafa',
-          }}>
-            <div style={{
-              fontSize: '0.8rem',
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              color: 'var(--text-light)',
-              marginBottom: '0.75rem',
-            }}>
-              Bydliště
-            </div>
-
-            <div className="form-group" style={{ marginBottom: form.residence === 'OTHER' ? '0.75rem' : 0 }}>
-              <label className="form-label" htmlFor="residence">Kde bydlíte? *</label>
-              <select
-                id="residence"
-                className="form-input"
-                value={form.residence}
-                onChange={e => set('residence', e.target.value)}
-                required
-              >
-                {VYSSI_BROD_PARTS.map(p => (
-                  <option key={p} value={p}>{p}</option>
+          <div className="form-group" style={{ position: 'relative' }}>
+            <label className="form-label" htmlFor="addressCity">Obec *</label>
+            <input
+              id="addressCity"
+              name="addressCity"
+              className="form-input"
+              autoComplete="off"
+              value={form.addressCity}
+              onChange={e => { set('addressCity', e.target.value); setShowSuggestions(true); }}
+              onFocus={() => setShowSuggestions(true)}
+              onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+              placeholder="Začněte psát, např. Vyšší Brod"
+              required
+            />
+            {showSuggestions && form.addressCity && citySuggestions.length > 0 && (
+              <div style={{
+                position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 10,
+                background: '#fff', border: '1px solid var(--border)', borderRadius: 'var(--radius)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)', maxHeight: 200, overflowY: 'auto',
+              }}>
+                {citySuggestions.map(s => (
+                  <div key={s}
+                    style={{ padding: '0.5rem 0.75rem', cursor: 'pointer' }}
+                    onMouseDown={() => { set('addressCity', s); setShowSuggestions(false); }}
+                  >
+                    {s}
+                  </div>
                 ))}
-                <option value="OTHER">Jiná obec (mimo Vyšší Brod)</option>
-              </select>
-              {form.residence !== 'OTHER' && (
-                <span className="form-hint">
-                  Vyšší Brod a jeho místní části – vaše trvalé bydliště je administrativně pod městem Vyšší Brod.
-                </span>
-              )}
-            </div>
-
-            {form.residence === 'OTHER' && (
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label" htmlFor="otherCity">Název obce *</label>
-                <input
-                  id="otherCity"
-                  name="otherCity"
-                  className="form-input"
-                  autoComplete="address-level2"
-                  value={form.otherCity}
-                  onChange={e => set('otherCity', e.target.value)}
-                  placeholder="např. Loučovice"
-                  required
-                />
-                <span className="form-hint" style={{ color: 'var(--warning)' }}>
-                  Upozornění: Nadace je určena primárně pro obyvatele Vyššího Brodu. Registrace bude individuálně posouzena.
-                </span>
               </div>
             )}
           </div>

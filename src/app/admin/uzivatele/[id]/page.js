@@ -135,13 +135,7 @@ export default function AdminUserDetailPage() {
                 <div className="detail-label">Rok narození</div>
                 <div className="detail-value">{user.dateOfBirth ? new Date(user.dateOfBirth).getFullYear() : '-'}</div>
                 <div className="detail-label">Bydliště</div>
-                <div className="detail-value">
-                  {[user.addressStreet, user.addressCity, user.addressZip]
-                    .filter(x => x && x !== '-')
-                    .join(', ') || '—'}
-                </div>
-                <div className="detail-label">Trvalé bydliště ve V. Brodě</div>
-                <div className="detail-value">{user.isPermanentResident ? 'Ano' : 'Ne'}</div>
+                <div className="detail-value">{user.addressCity || '—'}</div>
                 <div className="detail-label">Registrace</div>
                 <div className="detail-value">{new Date(user.createdAt).toLocaleDateString('cs-CZ')}</div>
               </>
@@ -175,24 +169,8 @@ export default function AdminUserDetailPage() {
                   </div>
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Ulice a č.p.</label>
-                  <input className="form-input" value={profile.addressStreet} onChange={e => setProf('addressStreet', e.target.value)} />
-                </div>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label className="form-label">Město</label>
-                    <input className="form-input" value={profile.addressCity} onChange={e => setProf('addressCity', e.target.value)} />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">PSČ</label>
-                    <input className="form-input" value={profile.addressZip} onChange={e => setProf('addressZip', e.target.value)} />
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <input type="checkbox" checked={profile.isPermanentResident} onChange={e => setProf('isPermanentResident', e.target.checked)} />
-                    Trvalé bydliště ve Vyšším Brodě
-                  </label>
+                  <label className="form-label">Město</label>
+                  <input className="form-input" value={profile.addressCity} onChange={e => setProf('addressCity', e.target.value)} />
                 </div>
                 <div className="btn-group">
                   <button className="btn btn-primary btn-sm" onClick={saveProfile}>Uložit</button>
@@ -200,25 +178,30 @@ export default function AdminUserDetailPage() {
                 </div>
               </>
             )}
-            {user.approvedBy && (
-              <>
-                <div className="detail-label">Schválil</div>
-                <div className="detail-value">{user.approvedBy.firstName} {user.approvedBy.lastName}</div>
-              </>
-            )}
-            {user.approvalNote && (
-              <>
-                <div className="detail-label">Poznámka ke schválení</div>
-                <div className="detail-value">{user.approvalNote}</div>
-              </>
-            )}
-            {user.rejectionReason && (
-              <>
-                <div className="detail-label">Důvod zamítnutí</div>
-                <div className="detail-value" style={{ color: 'var(--danger)' }}>{user.rejectionReason}</div>
-              </>
-            )}
           </div>
+
+          {(user.approvedBy || user.approvalNote || user.rejectionReason) && (
+            <div className="card" style={{ marginBottom: '1.5rem' }}>
+              {user.approvedBy && (
+                <>
+                  <div className="detail-label">Schválil</div>
+                  <div className="detail-value">{user.approvedBy.firstName} {user.approvedBy.lastName}</div>
+                </>
+              )}
+              {user.approvalNote && (
+                <>
+                  <div className="detail-label">Poznámka ke schválení</div>
+                  <div className="detail-value">{user.approvalNote}</div>
+                </>
+              )}
+              {user.rejectionReason && (
+                <>
+                  <div className="detail-label">Důvod zamítnutí</div>
+                  <div className="detail-value" style={{ color: 'var(--danger)' }}>{user.rejectionReason}</div>
+                </>
+              )}
+            </div>
+          )}
 
           {/* Pohovory */}
           <div className="card" style={{ marginBottom: '1.5rem' }}>

@@ -188,14 +188,8 @@ export default function AdminProjectDetailPage() {
             <div className="card">
               <div className="detail-label">Rozpočet</div>
               <div className="detail-value" style={{ fontWeight: 700, fontSize: '1.1rem' }}>{project.estimatedBudget?.toLocaleString('cs-CZ')} Kč</div>
-              <div className="detail-label">Požadovaná podpora</div>
-              <div className="detail-value">{project.requestedSupport?.toLocaleString('cs-CZ')} Kč</div>
               <div className="detail-label">Město</div>
               <div className="detail-value">{project.location}</div>
-              <div className="detail-label">Cílová skupina</div>
-              <div className="detail-value">{project.targetGroup}</div>
-              <div className="detail-label">Realizátor</div>
-              <div className="detail-value">{project.implementedBy}</div>
               <div className="detail-label">Termín</div>
               <div className="detail-value">{project.realizationDate}</div>
               <div className="detail-label">Velikost</div>
@@ -234,15 +228,9 @@ export default function AdminProjectDetailPage() {
             <textarea className="form-textarea" value={detail.benefitForCity} onChange={e => setDet('benefitForCity', e.target.value)} style={{ minHeight: 80 }} />
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">Požadovaná podpora (Kč)</label>
-              <input type="number" className="form-input" value={detail.requestedSupport} onChange={e => setDet('requestedSupport', e.target.value)} min="0" />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Termín realizace</label>
-              <input className="form-input" value={detail.realizationDate} onChange={e => setDet('realizationDate', e.target.value)} />
-            </div>
+          <div className="form-group">
+            <label className="form-label">Termín realizace</label>
+            <input className="form-input" value={detail.realizationDate} onChange={e => setDet('realizationDate', e.target.value)} />
           </div>
 
           <div className="form-row">
@@ -316,35 +304,18 @@ export default function AdminProjectDetailPage() {
 
           <div className="form-row">
             <div className="form-group">
-              <label className="form-label">Cílová skupina</label>
-              <input className="form-input" value={internal.targetGroup} onChange={e => setInt('targetGroup', e.target.value)} />
-            </div>
-            <div className="form-group">
               <label className="form-label">Město</label>
               <input className="form-input" value={internal.location} onChange={e => setInt('location', e.target.value)} placeholder="Vyšší Brod" />
             </div>
-          </div>
-
-          <div className="form-row">
             <div className="form-group">
               <label className="form-label">Předpokládaný rozpočet (Kč)</label>
               <input type="number" className="form-input" value={internal.estimatedBudget} onChange={e => setInt('estimatedBudget', e.target.value)} min="0" />
             </div>
-            <div className="form-group">
-              <label className="form-label">Požadovaná podpora (Kč)</label>
-              <input type="number" className="form-input" value={internal.requestedSupport} onChange={e => setInt('requestedSupport', e.target.value)} min="0" />
-            </div>
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">Termín realizace</label>
-              <input className="form-input" value={internal.realizationDate} onChange={e => setInt('realizationDate', e.target.value)} />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Kdo bude realizovat</label>
-              <input className="form-input" value={internal.implementedBy} onChange={e => setInt('implementedBy', e.target.value)} />
-            </div>
+          <div className="form-group">
+            <label className="form-label">Termín realizace</label>
+            <input className="form-input" value={internal.realizationDate} onChange={e => setInt('realizationDate', e.target.value)} />
           </div>
 
           <div className="form-group">
