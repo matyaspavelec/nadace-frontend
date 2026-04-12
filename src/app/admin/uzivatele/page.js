@@ -5,6 +5,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/errors';
 import { REGISTRATION_STATUSES, ROLES } from '@/lib/constants';
 import StatusBadge from '@/components/StatusBadge';
+import { Trash2 } from 'lucide-react';
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState([]);
@@ -31,6 +32,16 @@ export default function AdminUsersPage() {
     e.preventDefault();
     setPage(1);
     load();
+  };
+
+  const handleDelete = async (user) => {
+    if (!window.confirm(`Opravdu chcete smazat uživatele ${user.firstName} ${user.lastName}?`)) return;
+    try {
+      await api.deleteUser(user.id);
+      load();
+    } catch (err) {
+      alert(err.error || 'Chyba při mazání uživatele.');
+    }
   };
 
   return (
@@ -72,7 +83,12 @@ export default function AdminUsersPage() {
                   <td><StatusBadge status={u.registrationStatus} type="user" /></td>
                   <td><span className="badge badge-gray">{ROLES[u.role]}</span></td>
                   <td style={{ fontSize: '0.85rem', color: 'var(--text-light)' }}>{new Date(u.createdAt).toLocaleDateString('cs-CZ')}</td>
-                  <td><Link href={`/admin/uzivatele/${u.id}`} className="btn btn-sm btn-secondary">Detail</Link></td>
+                  <td style={{ display: 'flex', gap: '0.25rem' }}>
+                    <Link href={`/admin/uzivatele/${u.id}`} className="btn btn-sm btn-secondary">Detail</Link>
+                    <button className="btn btn-sm btn-danger" onClick={() => handleDelete(u)} title="Smazat uživatele">
+                      <Trash2 size={14} />
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>

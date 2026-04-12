@@ -42,6 +42,7 @@ export const api = {
   updateUserRole: (id, data) => request(`/users/${id}/role`, { method: 'PATCH', body: JSON.stringify(data) }),
   updateUserTrust: (id, data) => request(`/users/${id}/trust`, { method: 'PATCH', body: JSON.stringify(data) }),
   updateUserProfile: (id, data) => request(`/users/${id}/profile`, { method: 'PATCH', body: JSON.stringify(data) }),
+  deleteUser: (id) => request(`/users/${id}`, { method: 'DELETE' }),
 
   // Interviews
   getInterviews: (params = '') => request(`/interviews?${params}`),
