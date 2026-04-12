@@ -11,12 +11,12 @@ const STATUS_MAP = {
 };
 
 const STATUS_COLORS = {
-  PUBLISHED_FOR_VOTING: '#3b82f6',
-  VOTING_ENDED: '#6366f1',
-  RECOMMENDED_FOR_REALIZATION: '#059669',
-  IN_REALIZATION: '#0891b2',
-  COMPLETED: '#16a34a',
-  ARCHIVED: '#64748b',
+  PUBLISHED_FOR_VOTING: '#c9a84c',
+  VOTING_ENDED: '#8b7a3d',
+  RECOMMENDED_FOR_REALIZATION: '#4a9d6e',
+  IN_REALIZATION: '#c9a84c',
+  COMPLETED: '#4a9d6e',
+  ARCHIVED: '#555',
 };
 
 export default function EmbedProjectsPage() {
@@ -42,9 +42,9 @@ export default function EmbedProjectsPage() {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', minHeight: 200, fontFamily: "'Inter', -apple-system, sans-serif", color: '#888' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', minHeight: 200, fontFamily: "'Inter', -apple-system, sans-serif", color: '#c9a84c' }}>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ width: 32, height: 32, border: '3px solid #e5e7eb', borderTopColor: '#1a5632', borderRadius: '50%', animation: 'embed-spin 0.8s linear infinite', margin: '0 auto 12px' }} />
+          <div style={{ width: 32, height: 32, border: '3px solid #2a2a2a', borderTopColor: '#c9a84c', borderRadius: '50%', animation: 'embed-spin 0.8s linear infinite', margin: '0 auto 12px' }} />
           Načítání projektů...
         </div>
         <style>{`@keyframes embed-spin { to { transform: rotate(360deg); } }`}</style>
@@ -54,7 +54,7 @@ export default function EmbedProjectsPage() {
 
   if (error) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', minHeight: 200, fontFamily: "'Inter', -apple-system, sans-serif", color: '#dc2626' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', minHeight: 200, fontFamily: "'Inter', -apple-system, sans-serif", color: '#ef4444' }}>
         {error}
       </div>
     );
@@ -77,69 +77,73 @@ export default function EmbedProjectsPage() {
         body { background: transparent; }
         .embed-carousel {
           display: flex;
-          gap: 16px;
+          gap: 20px;
           overflow-x: auto;
           scroll-snap-type: x mandatory;
           -webkit-overflow-scrolling: touch;
           padding: 16px;
-          scrollbar-width: thin;
-          scrollbar-color: #cbd5e1 transparent;
+          scrollbar-width: none;
         }
-        .embed-carousel::-webkit-scrollbar { height: 6px; }
-        .embed-carousel::-webkit-scrollbar-track { background: transparent; }
-        .embed-carousel::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .embed-carousel::-webkit-scrollbar { display: none; }
         .embed-card {
           flex: 0 0 auto;
           width: 320px;
           min-width: 300px;
           max-width: 340px;
           scroll-snap-align: start;
-          background: #fff;
-          border: 1px solid #e5e7eb;
+          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid rgba(201, 168, 76, 0.2);
           border-radius: 12px;
-          padding: 1.25rem;
+          padding: 1.5rem;
           text-decoration: none;
           color: inherit;
           display: flex;
           flex-direction: column;
-          transition: box-shadow 0.2s, transform 0.2s;
+          transition: border-color 0.3s, background 0.3s, transform 0.2s;
           font-family: 'Inter', -apple-system, sans-serif;
+          backdrop-filter: blur(8px);
         }
         .embed-card:hover {
-          box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-          transform: translateY(-2px);
+          background: rgba(255, 255, 255, 0.08);
+          border-color: rgba(201, 168, 76, 0.5);
+          transform: translateY(-3px);
         }
         .embed-card-status {
           display: inline-block;
-          font-size: 0.75rem;
+          font-size: 0.72rem;
           font-weight: 600;
-          padding: 3px 10px;
+          padding: 4px 12px;
           border-radius: 99px;
           color: #fff;
           align-self: flex-start;
-          margin-bottom: 12px;
+          margin-bottom: 14px;
+          letter-spacing: 0.02em;
+          text-transform: uppercase;
         }
         .embed-card-title {
-          font-size: 1.05rem;
+          font-size: 1.1rem;
           font-weight: 700;
-          color: #1a5632;
-          margin-bottom: 8px;
-          line-height: 1.3;
+          color: #f0e6ce;
+          margin-bottom: 10px;
+          line-height: 1.35;
         }
         .embed-card-summary {
-          font-size: 0.87rem;
-          color: #555;
-          line-height: 1.55;
-          margin-bottom: 12px;
+          font-size: 0.85rem;
+          color: rgba(255, 255, 255, 0.55);
+          line-height: 1.6;
+          margin-bottom: 16px;
           flex: 1;
         }
         .embed-card-budget {
-          font-size: 1.1rem;
+          font-size: 1.15rem;
           font-weight: 700;
-          color: #1a5632;
+          background: linear-gradient(135deg, #c9a84c, #e8d48b);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
           margin-top: auto;
-          padding-top: 12px;
-          border-top: 1px solid #f0f0f0;
+          padding-top: 14px;
+          border-top: 1px solid rgba(201, 168, 76, 0.15);
         }
       `}</style>
       <div className="embed-carousel">
@@ -153,7 +157,7 @@ export default function EmbedProjectsPage() {
           >
             <span
               className="embed-card-status"
-              style={{ background: STATUS_COLORS[p.status] || '#6b7280' }}
+              style={{ background: STATUS_COLORS[p.status] || '#555' }}
             >
               {STATUS_MAP[p.status] || p.status}
             </span>
