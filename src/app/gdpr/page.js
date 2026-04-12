@@ -21,7 +21,7 @@ export default function GdprPage() {
         <h2 style={{ marginTop: 0 }}>1. Správce osobních údajů</h2>
         <p>
           Správcem osobních údajů je <strong>Nadace Inge a Miloše Pavelcových</strong>,
-          se sídlem Vyšší Brod. Kontaktní e-mail: <a href="mailto:info@nadacepavelcovych.cz">info@nadacepavelcovych.cz</a>.
+          se sídlem Vyšší Brod. Kontaktní e-mail: <a href="mailto:milos@pavelec.cz">milos@pavelec.cz</a>.
         </p>
         <p style={{ color: 'var(--text-light)', fontSize: '0.85rem' }}>
           (Upřesněte prosím údaje – IČO, úplnou adresu a kontaktní osobu před spuštěním v produkci.)
@@ -84,7 +84,7 @@ export default function GdprPage() {
         </ul>
         <p>
           Žádost o výmaz nebo export svých dat můžete podat e-mailem na{' '}
-          <a href="mailto:info@nadacepavelcovych.cz">info@nadacepavelcovych.cz</a>.
+          <a href="mailto:milos@pavelec.cz">milos@pavelec.cz</a>.
           Vaši žádost vyřídíme bez zbytečného odkladu, nejpozději do <strong>30 dnů</strong>.
         </p>
 
