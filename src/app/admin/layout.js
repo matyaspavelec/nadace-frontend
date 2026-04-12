@@ -3,14 +3,13 @@ import { useAuth } from '@/lib/auth';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { BarChart3, Users, FolderOpen, MessageSquare, FileText, ClipboardList, ScrollText } from 'lucide-react';
+import { BarChart3, Users, FolderOpen, ClipboardList, ScrollText } from 'lucide-react';
 
 const links = [
   { href: '/admin', label: 'Přehled', icon: BarChart3 },
   { href: '/admin/uzivatele', label: 'Uživatelé', icon: Users },
   { href: '/admin/projekty', label: 'Projekty', icon: FolderOpen },
   { href: '/admin/pohovory', label: 'Pohovory', icon: ClipboardList },
-  { href: '/admin/cms', label: 'Obsah', icon: FileText },
   { href: '/admin/audit', label: 'Audit log', icon: ScrollText },
 ];
 

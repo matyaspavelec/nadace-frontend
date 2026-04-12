@@ -54,9 +54,9 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-inner">
-        <Link href="/" className="navbar-brand">
+        <a href="https://pavelec.cz" className="navbar-brand">
           Nadace Pavelcových
-        </Link>
+        </a>
 
         <button className="mobile-toggle" onClick={() => setOpen(!open)}>
           {open ? <X size={24} /> : <Menu size={24} />}
