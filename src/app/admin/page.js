@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/errors';
 import { Users, FolderOpen, Vote, MessageSquare } from 'lucide-react';
+import { PROJECT_STATUSES } from '@/lib/constants';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
@@ -59,7 +60,7 @@ export default function AdminDashboard() {
               </thead>
               <tbody>
                 {stats.projects.byStatus.map(s => (
-                  <tr key={s.status}><td>{s.status}</td><td>{s._count}</td></tr>
+                  <tr key={s.status}><td>{PROJECT_STATUSES[s.status] || s.status}</td><td>{s._count}</td></tr>
                 ))}
               </tbody>
             </table>
