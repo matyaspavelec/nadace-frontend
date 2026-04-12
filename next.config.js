@@ -25,8 +25,12 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: '/:path*',
+        source: '/((?!embed).*)',
         headers: securityHeaders,
+      },
+      {
+        source: '/embed/:path*',
+        headers: securityHeaders.filter(h => h.key !== 'X-Frame-Options'),
       },
     ];
   },
