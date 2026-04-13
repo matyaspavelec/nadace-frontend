@@ -62,7 +62,7 @@ export default function ProfilePage() {
   // Editace profilu
   const [editProfile, setEditProfile] = useState(false);
   const [profileForm, setProfileForm] = useState({
-    phone: '', addressCity: '', birthYear: '',
+    phone: '', birthYear: '',
   });
   const [profileMsg, setProfileMsg] = useState({ error: '', success: '' });
   const setPf = (k, v) => setProfileForm(prev => ({ ...prev, [k]: v }));
@@ -71,7 +71,6 @@ export default function ProfilePage() {
     if (!profile) return;
     setProfileForm({
       phone: profile.phone || '',
-      addressCity: profile.addressCity || '',
       birthYear: profile.dateOfBirth ? String(new Date(profile.dateOfBirth).getFullYear()) : '',
     });
     setProfileMsg({ error: '', success: '' });
@@ -84,8 +83,6 @@ export default function ProfilePage() {
     try {
       const payload = {
         phone: profileForm.phone,
-        addressCity: profileForm.addressCity,
-        addressCity: profileForm.addressCity,
       };
       // Pokud ještě nebyl rok narození měněn a hodnota se liší → pošli
       const origYear = profile.dateOfBirth ? String(new Date(profile.dateOfBirth).getFullYear()) : '';
@@ -188,10 +185,6 @@ export default function ProfilePage() {
                   <div className="detail-value">{profile.email}</div>
                   <div className="detail-label">Telefon</div>
                   <div className="detail-value">{profile.phone || '—'}</div>
-                  <div className="detail-label">Bydliště</div>
-                  <div className="detail-value">
-                    {profile.addressCity || '—'}
-                  </div>
                   <div className="detail-label">Rok narození</div>
                   <div className="detail-value">
                     {new Date(profile.dateOfBirth).getFullYear()}
@@ -212,7 +205,7 @@ export default function ProfilePage() {
             <form onSubmit={handleProfileSave} style={{ maxWidth: 600 }}>
               <h3 style={{ marginBottom: '0.5rem' }}>Úprava osobních údajů</h3>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-light)', marginBottom: '1rem' }}>
-                Jméno, příjmení a e-mail může změnit pouze administrátor. Adresu a telefon můžete upravovat volně.
+                Jméno, příjmení a e-mail může změnit pouze administrátor. Telefon můžete upravovat volně.
                 {!profile.dateOfBirthChanged
                   ? ' Datum narození můžete opravit pouze jednou – pak už jen přes administrátora.'
                   : ' Datum narození jste již jednou změnili, další úpravu provede administrátor.'}
@@ -222,15 +215,6 @@ export default function ProfilePage() {
                 <label className="form-label">Telefon</label>
                 <input type="tel" className="form-input" value={profileForm.phone} onChange={e => setPf('phone', e.target.value)} required />
               </div>
-
-              <div className="form-group">
-                <label className="form-label">Obec / město</label>
-                <input className="form-input" value={profileForm.addressCity} onChange={e => setPf('addressCity', e.target.value)} required />
-                <span className="form-hint" style={{ color: 'var(--text-light)', fontSize: '0.8rem' }}>
-                  Stačí jen obec – ulici a PSČ z důvodu GDPR neshromažďujeme.
-                </span>
-              </div>
-
 
               <div className="form-group">
                 <label className="form-label">Rok narození</label>
@@ -300,7 +284,7 @@ export default function ProfilePage() {
               </div>
               <p style={{ fontSize: '0.88rem', color: 'var(--text-light)', marginBottom: '0.75rem' }}>
                 Máte právo kdykoliv požádat o smazání svého účtu (čl. 17 GDPR).
-                Vaše osobní údaje (jméno, e-mail, telefon, adresa, rok narození) budou nevratně
+                Vaše osobní údaje (jméno, e-mail, telefon, rok narození) budou nevratně
                 anonymizovány. Pokud jste podali projekty, hlasovali nebo komentovali, tyto záznamy
                 zůstanou v systému bez vazby na vaši identitu.
               </p>
