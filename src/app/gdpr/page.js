@@ -16,15 +16,12 @@ export default function GdprPage() {
         Informace o zpracování osobních údajů v souladu s nařízením EU 2016/679 (GDPR).
       </p>
 
-      <div className="card" style={{ lineHeight: 1.65 }}>
+      <div className="card" style={{ lineHeight: 1.6, fontSize: '0.9rem' }}>
 
         <h2 style={{ marginTop: 0 }}>1. Správce osobních údajů</h2>
         <p>
           Správcem osobních údajů je <strong>Nadace Inge a Miloše Pavelcových</strong>,
           se sídlem Vyšší Brod. Kontaktní e-mail: <a href="mailto:milos@pavelec.cz">milos@pavelec.cz</a>.
-        </p>
-        <p style={{ color: 'var(--text-light)', fontSize: '0.85rem' }}>
-          (Upřesněte prosím údaje – IČO, úplnou adresu a kontaktní osobu před spuštěním v produkci.)
         </p>
 
         <h2>2. Jaké osobní údaje zpracováváme</h2>
@@ -90,10 +87,10 @@ export default function GdprPage() {
 
         <h2>6. Předávání údajů třetím stranám</h2>
         <p>
-          Vaše osobní údaje <strong>nepředáváme</strong> žádným třetím stranám s výjimkou zpracovatelů,
-          kteří pro nadaci zajišťují technický provoz aplikace (hostingová platforma Railway, e-mailová
-          služba Resend pro odesílání potvrzovacích e-mailů). Všichni zpracovatelé jsou vázáni smluvními
-          podmínkami zajišťujícími odpovídající úroveň ochrany osobních údajů.
+          Vaše osobní údaje <strong>nepředáváme</strong> žádným třetím stranám s výjimkou
+          zpracovatelů, kteří pro nadaci zajišťují technický provoz aplikace (zejména hostingové
+          a e-mailové služby). Všichni zpracovatelé jsou vázáni smluvními podmínkami zajišťujícími
+          odpovídající úroveň ochrany osobních údajů v souladu s GDPR.
         </p>
         <p>
           Údaje nepředáváme mimo EU/EHP, s výjimkou případů, kdy to je nezbytné a kdy je zajištěna
