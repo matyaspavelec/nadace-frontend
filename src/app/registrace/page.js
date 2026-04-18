@@ -64,6 +64,7 @@ export default function RegisterPage() {
         dateOfBirth: `${form.birthYear}-01-01`,
         phone: form.phone,
         addressCity: form.addressCity.trim(),
+        isPermanentResident: true,
         gdprConsent: String(form.gdprConsent),
         rulesConsent: String(form.rulesConsent),
       });
