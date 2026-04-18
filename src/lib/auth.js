@@ -1,5 +1,6 @@
 'use client';
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { usePathname } from 'next/navigation';
 import { api } from './api';
 
 const AuthContext = createContext(null);
@@ -7,6 +8,7 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const pathname = usePathname();
 
   const loadUser = useCallback(async () => {
     const token = localStorage.getItem('token');
@@ -24,7 +26,7 @@ export function AuthProvider({ children }) {
     setLoading(false);
   }, []);
 
-  useEffect(() => { loadUser(); }, [loadUser]);
+  useEffect(() => { loadUser(); }, [loadUser, pathname]);
 
   const login = async (email, password) => {
     const data = await api.login({ email, password });
