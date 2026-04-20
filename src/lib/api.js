@@ -69,6 +69,7 @@ export const api = {
   vote: (data) => request('/votes', { method: 'POST', body: JSON.stringify(data) }),
   getMyVote: (projectId) => request(`/votes/my/${projectId}`),
   getVoteResults: (projectId) => request(`/votes/results/${projectId}`),
+  resetProjectVotes: (projectId) => request(`/votes/project/${projectId}`, { method: 'DELETE' }),
 
   // Comments
   addComment: (data) => request('/comments', { method: 'POST', body: JSON.stringify(data) }),

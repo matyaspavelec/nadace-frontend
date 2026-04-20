@@ -137,6 +137,20 @@ export default function AdminProjectDetailPage() {
     } catch (err) { setMsg(err.error || 'Chyba.'); }
   };
 
+  const resetVotes = async () => {
+    const total = (project?.votesFor || 0) + (project?.votesAgainst || 0);
+    if (total === 0) {
+      setMsg('Projekt nemá žádné hlasy.');
+      return;
+    }
+    if (!confirm(`Opravdu vynulovat všech ${total} hlasů u projektu „${project.title}"? Tato akce je nevratná a bude zapsána do audit logu.`)) return;
+    try {
+      const res = await api.resetProjectVotes(id);
+      setMsg(res.message || 'Hlasování vynulováno.');
+      load();
+    } catch (err) { setMsg(err.error || 'Chyba při vynulování hlasů.'); }
+  };
+
   if (loading) return <div className="loading"><div className="spinner" />Načítání...</div>;
   if (!project) return <div className="alert alert-error">Projekt nenalezen.</div>;
 
@@ -196,6 +210,14 @@ export default function AdminProjectDetailPage() {
               <div className="detail-value">{BUDGET_SIZES[project.budgetSize]}</div>
               <div className="detail-label">Hlasy</div>
               <div className="detail-value">Pro: {project.votesFor} | Proti: {project.votesAgainst}</div>
+              <button
+                className="btn btn-sm btn-danger"
+                onClick={resetVotes}
+                style={{ marginTop: '0.75rem', width: '100%' }}
+                disabled={(project.votesFor + project.votesAgainst) === 0}
+              >
+                Vynulovat hlasování
+              </button>
             </div>
           </div>
         </div>
