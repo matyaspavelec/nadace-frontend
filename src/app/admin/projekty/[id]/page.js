@@ -156,6 +156,25 @@ export default function AdminProjectDetailPage() {
   const [restartStart, setRestartStart] = useState('');
   const [restartEnd, setRestartEnd] = useState('');
 
+  // Voters list
+  const [voters, setVoters] = useState(null);
+  const loadVoters = async () => {
+    try {
+      const res = await api.getProjectVoters(id);
+      setVoters(res.voters || []);
+    } catch (err) { setMsg(err.error || 'Chyba při načítání voličů.'); }
+  };
+  const deleteSingleVote = async (vote) => {
+    const name = `${vote.user?.firstName || ''} ${vote.user?.lastName || ''}`.trim() || vote.user?.email;
+    if (!confirm(`Smazat hlas uživatele ${name} (${vote.value})? Uživatel pak bude moci znovu hlasovat.`)) return;
+    try {
+      await api.deleteVote(vote.id);
+      setMsg('Hlas smazán. Uživatel může znovu hlasovat.');
+      loadVoters();
+      load();
+    } catch (err) { setMsg(err.error || 'Chyba.'); }
+  };
+
   const restartVoting = async () => {
     if (!restartStart || !restartEnd) {
       setMsg('Vyplňte začátek i konec nového hlasování.');
@@ -200,6 +219,12 @@ export default function AdminProjectDetailPage() {
         <button className={`tab ${tab === 'review' ? 'active' : ''}`} onClick={() => setTab('review')}>Recenze ({project.reviews?.length || 0})</button>
         <button className={`tab ${tab === 'history' ? 'active' : ''}`} onClick={() => setTab('history')}>Historie</button>
         <button className={`tab ${tab === 'comments' ? 'active' : ''}`} onClick={() => setTab('comments')}>Komentáře ({project.comments?.length || 0})</button>
+        <button
+          className={`tab ${tab === 'voters' ? 'active' : ''}`}
+          onClick={() => { setTab('voters'); if (voters === null) loadVoters(); }}
+        >
+          Voliči ({(project.votesFor || 0) + (project.votesAgainst || 0)})
+        </button>
       </div>
 
       {tab === 'detail' && !editDetail && (
@@ -564,6 +589,59 @@ export default function AdminProjectDetailPage() {
               {h.note && <span style={{ fontSize: '0.85rem', color: 'var(--text-light)' }}>({h.note})</span>}
             </div>
           ))}
+        </div>
+      )}
+
+      {tab === 'voters' && (
+        <div className="card">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+            <h3 style={{ margin: 0 }}>Seznam voličů</h3>
+            <button className="btn btn-sm btn-secondary" onClick={loadVoters}>Obnovit</button>
+          </div>
+
+          {voters === null ? (
+            <p style={{ color: 'var(--text-light)', fontSize: '0.9rem' }}>Načítání...</p>
+          ) : voters.length === 0 ? (
+            <p style={{ color: 'var(--text-light)', fontSize: '0.9rem' }}>Pro tento projekt zatím nikdo nehlasoval.</p>
+          ) : (
+            <table style={{ width: '100%', fontSize: '0.9rem', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ textAlign: 'left', borderBottom: '1px solid var(--border)' }}>
+                  <th style={{ padding: '0.5rem 0.5rem 0.5rem 0' }}>Jméno</th>
+                  <th style={{ padding: '0.5rem' }}>E-mail</th>
+                  <th style={{ padding: '0.5rem' }}>Hlas</th>
+                  <th style={{ padding: '0.5rem' }}>Datum</th>
+                  <th style={{ padding: '0.5rem' }}>Komentář</th>
+                  <th style={{ padding: '0.5rem' }}></th>
+                </tr>
+              </thead>
+              <tbody>
+                {voters.map(v => (
+                  <tr key={v.id} style={{ borderBottom: '1px solid var(--border)' }}>
+                    <td style={{ padding: '0.5rem 0.5rem 0.5rem 0' }}>{v.user?.firstName} {v.user?.lastName}</td>
+                    <td style={{ padding: '0.5rem', color: 'var(--text-light)' }}>{v.user?.email}</td>
+                    <td style={{ padding: '0.5rem' }}>
+                      <span className={`badge ${v.value === 'YES' ? 'badge-success' : 'badge-danger'}`}>
+                        {v.value === 'YES' ? 'PRO' : 'PROTI'}
+                      </span>
+                    </td>
+                    <td style={{ padding: '0.5rem', color: 'var(--text-light)', fontSize: '0.8rem' }}>
+                      {new Date(v.createdAt).toLocaleString('cs-CZ')}
+                    </td>
+                    <td style={{ padding: '0.5rem', fontSize: '0.85rem', maxWidth: 240 }}>{v.comment || '—'}</td>
+                    <td style={{ padding: '0.5rem' }}>
+                      <button className="btn btn-sm btn-danger" onClick={() => deleteSingleVote(v)}>
+                        Smazat hlas
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-light)', marginTop: '1rem' }}>
+            Smazáním hlasu umožníte uživateli znovu hlasovat pro tento projekt. Akce je zaznamenána v audit logu.
+          </p>
         </div>
       )}
 
