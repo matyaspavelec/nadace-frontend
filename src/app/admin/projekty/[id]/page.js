@@ -137,21 +137,7 @@ export default function AdminProjectDetailPage() {
     } catch (err) { setMsg(err.error || 'Chyba.'); }
   };
 
-  const resetVotes = async () => {
-    const total = (project?.votesFor || 0) + (project?.votesAgainst || 0);
-    if (total === 0) {
-      setMsg('Projekt nemá žádné hlasy.');
-      return;
-    }
-    if (!confirm(`Opravdu vynulovat všech ${total} hlasů u projektu „${project.title}"? Tato akce je nevratná a bude zapsána do audit logu.`)) return;
-    try {
-      const res = await api.resetProjectVotes(id);
-      setMsg(res.message || 'Hlasování vynulováno.');
-      load();
-    } catch (err) { setMsg(err.error || 'Chyba při vynulování hlasů.'); }
-  };
-
-  // Restart voting — smaže hlasy + nastaví nové datum
+  // Restart voting — vždy smaže hlasy; datumy volitelné (když nejsou, jen wipe)
   const [showRestart, setShowRestart] = useState(false);
   const [restartStart, setRestartStart] = useState('');
   const [restartEnd, setRestartEnd] = useState('');
@@ -176,18 +162,29 @@ export default function AdminProjectDetailPage() {
   };
 
   const restartVoting = async () => {
-    if (!restartStart || !restartEnd) {
-      setMsg('Vyplňte začátek i konec nového hlasování.');
+    if (restartStart && !restartEnd) {
+      setMsg('Vyplňte i konec nového hlasování (nebo nechte obě pole prázdná pro čistý wipe).');
+      return;
+    }
+    if (!restartStart && restartEnd) {
+      setMsg('Vyplňte i začátek nového hlasování (nebo nechte obě pole prázdná pro čistý wipe).');
       return;
     }
     const total = (project?.votesFor || 0) + (project?.votesAgainst || 0);
-    if (!confirm(`Restartovat hlasování? Smaže se ${total} stávajících hlasů a projekt se nastaví na nové okno hlasování.`)) return;
+    if (total === 0 && !restartStart) {
+      setMsg('Projekt nemá žádné hlasy a nezadali jste nové okno — není co dělat.');
+      return;
+    }
+    const msg = restartStart
+      ? `Restartovat hlasování? Smaže se ${total} stávajících hlasů a projekt se nastaví na nové okno hlasování.`
+      : `Vynulovat ${total} hlasů? Status ani datumy se nezmění.`;
+    if (!confirm(msg)) return;
     try {
-      const res = await api.restartProjectVotes(id, {
-        votingStartDate: new Date(restartStart).toISOString(),
-        votingEndDate: new Date(restartEnd).toISOString(),
-      });
-      setMsg(res.message || 'Hlasování restartováno.');
+      const body = {};
+      if (restartStart) body.votingStartDate = new Date(restartStart).toISOString();
+      if (restartEnd) body.votingEndDate = new Date(restartEnd).toISOString();
+      const res = await api.restartProjectVotes(id, body);
+      setMsg(res.message || 'Hotovo.');
       setShowRestart(false);
       setRestartStart('');
       setRestartEnd('');
@@ -261,32 +258,27 @@ export default function AdminProjectDetailPage() {
               <div className="detail-label">Hlasy</div>
               <div className="detail-value">Pro: {project.votesFor} | Proti: {project.votesAgainst}</div>
               <button
-                className="btn btn-sm btn-danger"
-                onClick={resetVotes}
-                style={{ marginTop: '0.75rem', width: '100%' }}
-                disabled={(project.votesFor + project.votesAgainst) === 0}
-              >
-                Vynulovat hlasování
-              </button>
-              <button
                 className="btn btn-sm btn-warning"
                 onClick={() => setShowRestart(v => !v)}
-                style={{ marginTop: '0.5rem', width: '100%' }}
+                style={{ marginTop: '0.75rem', width: '100%' }}
               >
-                {showRestart ? 'Zrušit restart' : 'Restartovat hlasování'}
+                {showRestart ? 'Zavřít' : 'Restartovat hlasování'}
               </button>
               {showRestart && (
                 <div style={{ marginTop: '0.75rem', padding: '0.75rem', background: 'var(--bg-light)', borderRadius: 6 }}>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-light)', marginBottom: '0.5rem' }}>
+                    Smaže všechny hlasy. Datumy jsou volitelné — když nevyplníš, jen se vynulují počítadla.
+                  </p>
                   <div className="form-group" style={{ marginBottom: '0.5rem' }}>
-                    <label className="form-label" style={{ fontSize: '0.8rem' }}>Nový začátek</label>
+                    <label className="form-label" style={{ fontSize: '0.8rem' }}>Nový začátek (volitelné)</label>
                     <input type="datetime-local" className="form-input" value={restartStart} onChange={e => setRestartStart(e.target.value)} />
                   </div>
                   <div className="form-group" style={{ marginBottom: '0.5rem' }}>
-                    <label className="form-label" style={{ fontSize: '0.8rem' }}>Nový konec</label>
+                    <label className="form-label" style={{ fontSize: '0.8rem' }}>Nový konec (volitelné)</label>
                     <input type="datetime-local" className="form-input" value={restartEnd} onChange={e => setRestartEnd(e.target.value)} />
                   </div>
                   <button className="btn btn-sm btn-primary" onClick={restartVoting} style={{ width: '100%' }}>
-                    Potvrdit restart
+                    Potvrdit
                   </button>
                 </div>
               )}

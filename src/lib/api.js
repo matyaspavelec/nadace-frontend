@@ -69,7 +69,6 @@ export const api = {
   vote: (data) => request('/votes', { method: 'POST', body: JSON.stringify(data) }),
   getMyVote: (projectId) => request(`/votes/my/${projectId}`),
   getVoteResults: (projectId) => request(`/votes/results/${projectId}`),
-  resetProjectVotes: (projectId) => request(`/votes/project/${projectId}`, { method: 'DELETE' }),
   restartProjectVotes: (projectId, data) => request(`/votes/project/${projectId}/restart`, { method: 'POST', body: JSON.stringify(data) }),
   getProjectVoters: (projectId) => request(`/votes/project/${projectId}/voters`),
   deleteVote: (voteId) => request(`/votes/${voteId}`, { method: 'DELETE' }),
