@@ -175,14 +175,29 @@ export default function ProjectDetailPage() {
               </>
             )}
 
-            {votingActive && canVote && (
-              <div className="vote-buttons">
-                <button className={`vote-btn ${myVote?.value === 'YES' ? 'selected-yes' : ''}`} onClick={() => handleVote('YES')}>
-                  <ThumbsUp size={20} style={{ marginBottom: 4 }} /><br />Pro
-                </button>
-                <button className={`vote-btn ${myVote?.value === 'NO' ? 'selected-no' : ''}`} onClick={() => handleVote('NO')}>
-                  <ThumbsDown size={20} style={{ marginBottom: 4 }} /><br />Proti
-                </button>
+            {votingActive && canVote && !myVote && (
+              <>
+                <div className="vote-buttons">
+                  <button className="vote-btn" onClick={() => handleVote('YES')}>
+                    <ThumbsUp size={20} style={{ marginBottom: 4 }} /><br />Pro
+                  </button>
+                  <button className="vote-btn" onClick={() => handleVote('NO')}>
+                    <ThumbsDown size={20} style={{ marginBottom: 4 }} /><br />Proti
+                  </button>
+                </div>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-light)', textAlign: 'center', marginTop: 8 }}>
+                  Hlas je konečný a nelze jej změnit.
+                </p>
+              </>
+            )}
+
+            {myVote && (
+              <div className={`alert ${myVote.value === 'YES' ? 'alert-success' : 'alert-warning'}`}>
+                {myVote.value === 'YES' ? (
+                  <><ThumbsUp size={16} style={{ verticalAlign: 'middle', marginRight: 6 }} />Hlasoval/a jste PRO.</>
+                ) : (
+                  <><ThumbsDown size={16} style={{ verticalAlign: 'middle', marginRight: 6 }} />Hlasoval/a jste PROTI.</>
+                )}
               </div>
             )}
 
