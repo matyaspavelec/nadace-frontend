@@ -151,6 +151,31 @@ export default function AdminProjectDetailPage() {
     } catch (err) { setMsg(err.error || 'Chyba při vynulování hlasů.'); }
   };
 
+  // Restart voting — smaže hlasy + nastaví nové datum
+  const [showRestart, setShowRestart] = useState(false);
+  const [restartStart, setRestartStart] = useState('');
+  const [restartEnd, setRestartEnd] = useState('');
+
+  const restartVoting = async () => {
+    if (!restartStart || !restartEnd) {
+      setMsg('Vyplňte začátek i konec nového hlasování.');
+      return;
+    }
+    const total = (project?.votesFor || 0) + (project?.votesAgainst || 0);
+    if (!confirm(`Restartovat hlasování? Smaže se ${total} stávajících hlasů a projekt se nastaví na nové okno hlasování.`)) return;
+    try {
+      const res = await api.restartProjectVotes(id, {
+        votingStartDate: new Date(restartStart).toISOString(),
+        votingEndDate: new Date(restartEnd).toISOString(),
+      });
+      setMsg(res.message || 'Hlasování restartováno.');
+      setShowRestart(false);
+      setRestartStart('');
+      setRestartEnd('');
+      load();
+    } catch (err) { setMsg(err.error || 'Chyba při restartu hlasování.'); }
+  };
+
   if (loading) return <div className="loading"><div className="spinner" />Načítání...</div>;
   if (!project) return <div className="alert alert-error">Projekt nenalezen.</div>;
 
@@ -218,6 +243,28 @@ export default function AdminProjectDetailPage() {
               >
                 Vynulovat hlasování
               </button>
+              <button
+                className="btn btn-sm btn-warning"
+                onClick={() => setShowRestart(v => !v)}
+                style={{ marginTop: '0.5rem', width: '100%' }}
+              >
+                {showRestart ? 'Zrušit restart' : 'Restartovat hlasování'}
+              </button>
+              {showRestart && (
+                <div style={{ marginTop: '0.75rem', padding: '0.75rem', background: 'var(--bg-light)', borderRadius: 6 }}>
+                  <div className="form-group" style={{ marginBottom: '0.5rem' }}>
+                    <label className="form-label" style={{ fontSize: '0.8rem' }}>Nový začátek</label>
+                    <input type="datetime-local" className="form-input" value={restartStart} onChange={e => setRestartStart(e.target.value)} />
+                  </div>
+                  <div className="form-group" style={{ marginBottom: '0.5rem' }}>
+                    <label className="form-label" style={{ fontSize: '0.8rem' }}>Nový konec</label>
+                    <input type="datetime-local" className="form-input" value={restartEnd} onChange={e => setRestartEnd(e.target.value)} />
+                  </div>
+                  <button className="btn btn-sm btn-primary" onClick={restartVoting} style={{ width: '100%' }}>
+                    Potvrdit restart
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

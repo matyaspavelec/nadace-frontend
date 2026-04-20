@@ -70,6 +70,7 @@ export const api = {
   getMyVote: (projectId) => request(`/votes/my/${projectId}`),
   getVoteResults: (projectId) => request(`/votes/results/${projectId}`),
   resetProjectVotes: (projectId) => request(`/votes/project/${projectId}`, { method: 'DELETE' }),
+  restartProjectVotes: (projectId, data) => request(`/votes/project/${projectId}/restart`, { method: 'POST', body: JSON.stringify(data) }),
 
   // Comments
   addComment: (data) => request('/comments', { method: 'POST', body: JSON.stringify(data) }),
